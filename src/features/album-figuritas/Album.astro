@@ -1,0 +1,27 @@
+---
+import Section from '@components/ui/Section.astro';
+import SectionHeading from '@components/ui/SectionHeading.astro';
+import AlbumGrid from './components/AlbumGrid.tsx';
+import type { Model } from '@data/model.schema';
+
+interface Props { models: Model[] }
+const { models } = Astro.props;
+---
+<Section id="album" labelledby="album-title" class="bg-bg">
+  <SectionHeading
+    eyebrow="Coleccionable"
+    eyebrowVariant="gold"
+    title="Tu álbum de figuritas"
+    id="album-title"
+    align="center"
+  >
+    <p class="text-fg-muted">
+      Pega cada figurita para desbloquearla, gírala para ver el reverso y persigue las
+      legendarias con acabado holográfico. Tu progreso se guarda en este dispositivo.
+    </p>
+  </SectionHeading>
+
+  <div class="mt-12" data-reveal style="--reveal-delay: 80ms">
+    <AlbumGrid models={models} client:visible />
+  </div>
+</Section>
