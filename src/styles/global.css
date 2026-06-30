@@ -1,0 +1,211 @@
+@import 'tailwindcss';
+@import './tokens.css';
+
+/* =============================================================
+   Map design tokens -> Tailwind v4 theme.
+   Generates utilities like bg-bg, text-crimson-500, font-display, etc.
+   Values reference the CSS vars so a single swap re-themes everything.
+   ============================================================= */
+@theme {
+  --color-bg: var(--c-bg);
+  --color-bg-elev: var(--c-bg-elev);
+  --color-surface: var(--c-surface);
+  --color-surface-2: var(--c-surface-2);
+  --color-border: var(--c-border);
+  --color-border-strong: var(--c-border-strong);
+
+  --color-crimson-50: var(--c-crimson-50);
+  --color-crimson-300: var(--c-crimson-300);
+  --color-crimson-500: var(--c-crimson-500);
+  --color-crimson-600: var(--c-crimson-600);
+  --color-crimson-700: var(--c-crimson-700);
+
+  --color-gold-300: var(--c-gold-300);
+  --color-gold-400: var(--c-gold-400);
+  --color-gold-500: var(--c-gold-500);
+  --color-gold-600: var(--c-gold-600);
+
+  --color-fg: var(--c-fg);
+  --color-fg-muted: var(--c-fg-muted);
+  --color-fg-subtle: var(--c-fg-subtle);
+  --color-on-crimson: var(--c-on-crimson);
+  --color-on-gold: var(--c-on-gold);
+
+  --color-like: var(--c-like);
+  --color-nope: var(--c-nope);
+
+  --radius-sm: var(--radius-sm);
+  --radius-md: var(--radius-md);
+  --radius-lg: var(--radius-lg);
+  --radius-xl: var(--radius-xl);
+
+  --font-display: var(--font-display);
+  --font-sans: var(--font-sans);
+}
+
+/* =============================================================
+   Base
+   ============================================================= */
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+html {
+  scroll-behavior: smooth;
+  -webkit-text-size-adjust: 100%;
+  background-color: var(--c-bg);
+}
+
+body {
+  margin: 0;
+  min-height: 100dvh;
+  background-color: var(--c-bg);
+  color: var(--c-fg);
+  font-family: var(--font-sans);
+  font-size: 1rem;
+  line-height: 1.6;
+  -webkit-font-smoothing: antialiased;
+  text-rendering: optimizeLegibility;
+}
+
+h1, h2, h3, h4 {
+  font-family: var(--font-display);
+  line-height: 1.08;
+  letter-spacing: -0.01em;
+  font-weight: 600;
+  text-wrap: balance;
+}
+
+a {
+  color: inherit;
+  text-decoration: none;
+}
+
+img, picture, video {
+  display: block;
+  max-width: 100%;
+}
+
+/* Visible focus for keyboard users (AA). */
+:focus-visible {
+  outline: 2px solid var(--c-gold-400);
+  outline-offset: 2px;
+  border-radius: 2px;
+}
+
+.sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border: 0;
+}
+
+/* =============================================================
+   Animation utilities (CSS-only; no JS per frame).
+   Only transform/opacity are animated -> GPU friendly.
+   ============================================================= */
+
+/* Scroll-reveal: elements start hidden, .is-visible toggled by IO. */
+[data-reveal] {
+  opacity: 0;
+  transform: translateY(24px);
+  transition:
+    opacity var(--dur-slow) var(--ease-out-soft),
+    transform var(--dur-slow) var(--ease-out-soft);
+  transition-delay: var(--reveal-delay, 0ms);
+  will-change: transform, opacity;
+}
+[data-reveal].is-visible {
+  opacity: 1;
+  transform: none;
+}
+/* Drop will-change once settled (set by the observer). */
+[data-reveal].is-settled {
+  will-change: auto;
+}
+
+@keyframes float-y {
+  0%, 100% { transform: translate3d(0, 0, 0); }
+  50% { transform: translate3d(0, -10px, 0); }
+}
+
+@keyframes shimmer-gold {
+  0% { background-position: 200% 0; }
+  100% { background-position: -200% 0; }
+}
+
+/* --- Holographic foil for premium album cards ---
+   Static holographic tint + a sheen bar that travels using transform only
+   (GPU-composited). No layout properties animated. */
+.foil::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  border-radius: inherit;
+  background:
+    linear-gradient(115deg,
+      rgba(255, 0, 128, 0.18),
+      rgba(0, 200, 255, 0.18) 30%,
+      rgba(205, 163, 92, 0.22) 55%,
+      rgba(120, 0, 255, 0.18) 80%);
+  mix-blend-mode: screen;
+  opacity: 0.7;
+}
+.foil-sheen {
+  position: absolute;
+  inset: -50%;
+  pointer-events: none;
+  background: linear-gradient(
+    115deg,
+    transparent 40%,
+    rgba(255, 255, 255, 0.55) 50%,
+    transparent 60%
+  );
+  transform: translateX(-60%);
+  animation: foil-travel 3.4s var(--ease-out-soft) infinite;
+  will-change: transform;
+}
+@keyframes foil-travel {
+  0% { transform: translateX(-60%); }
+  60%, 100% { transform: translateX(60%); }
+}
+@media (prefers-reduced-motion: reduce) {
+  .foil-sheen { animation: none; opacity: 0.25; }
+}
+
+/* =============================================================
+   Reduced motion: honor user preference everywhere.
+   ============================================================= */
+@media (prefers-reduced-motion: reduce) {
+  html {
+    scroll-behavior: auto;
+  }
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.001ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.001ms !important;
+    scroll-behavior: auto !important;
+  }
+  [data-reveal] {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+/* View Transitions: gentle cross-fade default (per-element names set inline). */
+@media (prefers-reduced-motion: no-preference) {
+  ::view-transition-old(root),
+  ::view-transition-new(root) {
+    animation-duration: var(--dur-mid);
+  }
+}

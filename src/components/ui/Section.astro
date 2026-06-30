@@ -1,0 +1,21 @@
+---
+/** Semantic section wrapper with consistent rhythm + max width. */
+interface Props {
+  id?: string;
+  class?: string;
+  as?: 'section' | 'div' | 'article' | 'footer' | 'header';
+  full?: boolean; // skip the inner max-width container
+  labelledby?: string;
+}
+const { id, class: className = '', as = 'section', full = false, labelledby } = Astro.props;
+const Tag = as;
+---
+<Tag id={id} class:list={['relative py-20 sm:py-28', className]} aria-labelledby={labelledby}>
+  {full ? (
+    <slot />
+  ) : (
+    <div class="mx-auto w-full max-w-6xl px-5 sm:px-8">
+      <slot />
+    </div>
+  )}
+</Tag>

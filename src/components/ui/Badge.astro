@@ -1,0 +1,31 @@
+---
+/**
+ * Solid badge/chip. NO glassmorphism — no backdrop-blur, no semi-transparent
+ * fills anywhere. Variants use brand tokens with real contrast.
+ */
+interface Props {
+  variant?: 'crimson' | 'gold' | 'outline' | 'neutral';
+  size?: 'sm' | 'md';
+  class?: string;
+}
+const { variant = 'crimson', size = 'md', class: className = '' } = Astro.props;
+
+const base =
+  'inline-flex items-center gap-1.5 font-medium leading-none rounded-[--radius-pill] whitespace-nowrap';
+const sizes = {
+  sm: 'text-[0.6875rem] px-2.5 py-1 tracking-wide',
+  md: 'text-xs px-3 py-1.5 tracking-wide',
+};
+const variants = {
+  // solid crimson — default/action
+  crimson: 'bg-crimson-500 text-on-crimson',
+  // solid champagne gold — premium / VIP
+  gold: 'bg-gold-500 text-on-gold',
+  // solid border, solid bg surface (NOT transparent)
+  outline: 'bg-surface text-fg border border-border-strong',
+  neutral: 'bg-surface-2 text-fg-muted',
+};
+---
+<span class:list={[base, sizes[size], variants[variant], className]}>
+  <slot />
+</span>

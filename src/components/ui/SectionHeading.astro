@@ -1,0 +1,22 @@
+---
+import Badge from './Badge.astro';
+interface Props {
+  eyebrow?: string;
+  eyebrowVariant?: 'crimson' | 'gold' | 'outline' | 'neutral';
+  title: string;
+  id?: string;
+  align?: 'left' | 'center';
+}
+const { eyebrow, eyebrowVariant = 'gold', title, id, align = 'left' } = Astro.props;
+---
+<header
+  class:list={[
+    'flex flex-col gap-4 max-w-2xl',
+    align === 'center' && 'mx-auto items-center text-center',
+  ]}
+  data-reveal
+>
+  {eyebrow && <Badge variant={eyebrowVariant} size="sm">{eyebrow}</Badge>}
+  <h2 id={id} class="text-3xl sm:text-4xl md:text-5xl text-fg">{title}</h2>
+  <slot />
+</header>

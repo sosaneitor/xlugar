@@ -1,0 +1,43 @@
+---
+/**
+ * Button / link with tactile microinteractions (glow + scale on hover/active).
+ * Animates transform/opacity + box-shadow only on discrete states (not loops).
+ */
+interface Props {
+  href?: string;
+  variant?: 'crimson' | 'gold' | 'ghost';
+  size?: 'sm' | 'md' | 'lg';
+  type?: 'button' | 'submit';
+  class?: string;
+  'aria-label'?: string;
+}
+const {
+  href,
+  variant = 'crimson',
+  size = 'md',
+  type = 'button',
+  class: className = '',
+  ...rest
+} = Astro.props;
+
+const base =
+  'group relative inline-flex items-center justify-center gap-2 font-medium rounded-[--radius-md] ' +
+  'transition-[transform,box-shadow,background-color] duration-[--dur-fast] ease-[--ease-out-soft] ' +
+  'hover:-translate-y-0.5 active:translate-y-0 active:scale-[0.98] motion-reduce:transform-none ' +
+  'focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-gold-400';
+const sizes = {
+  sm: 'text-sm px-4 py-2',
+  md: 'text-[0.95rem] px-5 py-2.5',
+  lg: 'text-base px-7 py-3.5',
+};
+const variants = {
+  crimson: 'bg-crimson-500 text-on-crimson hover:bg-crimson-600 hover:shadow-[var(--shadow-glow-crimson)]',
+  gold: 'bg-gold-500 text-on-gold hover:bg-gold-400 hover:shadow-[var(--shadow-glow-gold)]',
+  ghost: 'bg-surface text-fg border border-border-strong hover:border-gold-500 hover:text-gold-300',
+};
+const cls = [base, sizes[size], variants[variant], className];
+const Tag = href ? 'a' : 'button';
+---
+<Tag class:list={cls} href={href} type={href ? undefined : type} {...rest}>
+  <slot />
+</Tag>
