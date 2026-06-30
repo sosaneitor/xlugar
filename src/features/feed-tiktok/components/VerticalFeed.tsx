@@ -98,7 +98,7 @@ function FeedSlide({ slide, eager }: { slide: Slide; eager: boolean }) {
           <div className="mb-1 flex items-center gap-2">
             <span className="font-display text-lg text-fg">{slide.model.name}</span>
             {slide.model.premium && (
-              <span className="rounded-full bg-gold-500 px-2 py-0.5 text-[0.625rem] font-semibold tracking-wide text-on-gold">
+              <span className="rounded-full bg-premium-500 px-2 py-0.5 text-[0.625rem] font-semibold tracking-wide text-on-premium">
                 VIP
               </span>
             )}
@@ -123,7 +123,7 @@ function FeedSlide({ slide, eager }: { slide: Slide; eager: boolean }) {
       {/* Active-slide pulse indicator (transform/opacity only) */}
       <motion.span
         aria-hidden="true"
-        className="absolute left-4 top-4 h-2 w-2 rounded-full bg-crimson-500"
+        className="absolute left-4 top-4 h-2 w-2 rounded-full bg-primary-500"
         animate={active ? { scale: [1, 1.6, 1], opacity: [1, 0.4, 1] } : { scale: 1, opacity: 0.4 }}
         transition={{ duration: 1.6, repeat: active ? Infinity : 0, ease: 'easeInOut' }}
       />
@@ -150,8 +150,8 @@ function FeedAction({
       onClick={onClick}
       whileTap={{ scale: 0.8 }}
       className={`grid h-12 w-12 place-items-center rounded-full border border-border-strong bg-surface text-xl
-        transition-colors duration-150 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-gold-400
-        ${active ? 'text-crimson-500' : 'text-fg'}`}
+        transition-colors duration-150 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-premium-400
+        ${active ? 'text-primary-500' : 'text-fg'}`}
     >
       {children}
     </motion.button>

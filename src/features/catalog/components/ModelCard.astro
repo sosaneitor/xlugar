@@ -38,8 +38,8 @@ const { cover } = model;
     <div class="pointer-events-none absolute inset-x-0 bottom-0 h-2/3 bg-gradient-to-t from-bg to-transparent"></div>
 
     <div class="absolute left-3 top-3 flex gap-2">
-      {model.premium && <Badge variant="gold" size="sm">VIP</Badge>}
-      {model.rarity === 'legendary' && <Badge variant="crimson" size="sm">Legendaria</Badge>}
+      {model.premium && <Badge variant="premium" size="sm">VIP</Badge>}
+      {model.rarity === 'legendary' && <Badge variant="primary" size="sm">Legendaria</Badge>}
     </div>
   </div>
 

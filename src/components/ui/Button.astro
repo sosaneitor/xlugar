@@ -5,7 +5,7 @@
  */
 interface Props {
   href?: string;
-  variant?: 'crimson' | 'gold' | 'ghost';
+  variant?: 'gradient' | 'primary' | 'premium' | 'ghost';
   size?: 'sm' | 'md' | 'lg';
   type?: 'button' | 'submit';
   class?: string;
@@ -13,7 +13,7 @@ interface Props {
 }
 const {
   href,
-  variant = 'crimson',
+  variant = 'primary',
   size = 'md',
   type = 'button',
   class: className = '',
@@ -21,19 +21,22 @@ const {
 } = Astro.props;
 
 const base =
-  'group relative inline-flex items-center justify-center gap-2 font-medium rounded-[--radius-md] ' +
+  'group relative inline-flex items-center justify-center gap-2 font-semibold rounded-[--radius-pill] ' +
   'transition-[transform,box-shadow,background-color] duration-[--dur-fast] ease-[--ease-out-soft] ' +
   'hover:-translate-y-0.5 active:translate-y-0 active:scale-[0.98] motion-reduce:transform-none ' +
-  'focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-gold-400';
+  'focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-premium-400';
 const sizes = {
-  sm: 'text-sm px-4 py-2',
-  md: 'text-[0.95rem] px-5 py-2.5',
-  lg: 'text-base px-7 py-3.5',
+  sm: 'text-sm px-5 py-2',
+  md: 'text-[0.95rem] px-6 py-2.5',
+  lg: 'text-base px-8 py-3.5',
 };
 const variants = {
-  crimson: 'bg-crimson-500 text-on-crimson hover:bg-crimson-600 hover:shadow-[var(--shadow-glow-crimson)]',
-  gold: 'bg-gold-500 text-on-gold hover:bg-gold-400 hover:shadow-[var(--shadow-glow-gold)]',
-  ghost: 'bg-surface text-fg border border-border-strong hover:border-gold-500 hover:text-gold-300',
+  // Hero CTA — brand gradient (pink -> violet) with primary glow
+  gradient:
+    'text-on-primary [background-image:var(--gradient-brand)] hover:shadow-[var(--shadow-glow-primary)]',
+  primary: 'bg-primary-500 text-on-primary hover:bg-primary-600 hover:shadow-[var(--shadow-glow-primary)]',
+  premium: 'bg-premium-500 text-on-premium hover:bg-premium-400 hover:shadow-[var(--shadow-glow-premium)]',
+  ghost: 'bg-surface text-fg border border-border-strong hover:border-premium-500 hover:text-premium-300',
 };
 const cls = [base, sizes[size], variants[variant], className];
 const Tag = href ? 'a' : 'button';

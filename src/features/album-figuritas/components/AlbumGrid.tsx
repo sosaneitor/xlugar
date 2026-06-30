@@ -10,8 +10,8 @@ const STORAGE_KEY = 'xlugar:album:v1';
 
 const rarityRing: Record<Model['rarity'], string> = {
   common: 'border-border-strong',
-  rare: 'border-crimson-600',
-  legendary: 'border-gold-500',
+  rare: 'border-primary-600',
+  legendary: 'border-premium-500',
 };
 const rarityLabel: Record<Model['rarity'], string> = {
   common: 'Común',
@@ -67,7 +67,7 @@ export default function AlbumGrid({ models }: Props) {
       <div className="mb-6 flex flex-wrap items-center justify-between gap-4">
         <p className="text-sm text-fg-muted">
           Colección{' '}
-          <span className="font-display text-lg text-gold-400">
+          <span className="font-display text-lg text-premium-400">
             {have}/{total}
           </span>
         </p>
@@ -75,7 +75,7 @@ export default function AlbumGrid({ models }: Props) {
           <button
             type="button"
             onClick={collectAll}
-            className="rounded-[--radius-md] bg-crimson-500 px-4 py-2 text-sm font-medium text-on-crimson transition-transform hover:-translate-y-0.5 motion-reduce:transform-none"
+            className="rounded-[--radius-md] bg-primary-500 px-4 py-2 text-sm font-medium text-on-primary transition-transform hover:-translate-y-0.5 motion-reduce:transform-none"
           >
             Completar álbum
           </button>
@@ -127,8 +127,8 @@ function Sticker({
         aria-label={`Desbloquear figurita de ${model.name}`}
         className={`relative grid aspect-[3/4] w-full place-items-center overflow-hidden rounded-[--radius-lg]
           border-2 border-dashed ${rarityRing[model.rarity]} bg-surface text-center
-          transition-[transform,border-color] duration-200 hover:-translate-y-1 hover:border-gold-400
-          focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-gold-400 motion-reduce:transform-none`}
+          transition-[transform,border-color] duration-200 hover:-translate-y-1 hover:border-premium-400
+          focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-premium-400 motion-reduce:transform-none`}
       >
         <div className="px-3">
           <span className="block text-3xl text-fg-subtle">＋</span>
@@ -153,7 +153,7 @@ function Sticker({
         animate={{ scale: 1, opacity: 1, rotate: 0 }}
         transition={{ type: 'spring', stiffness: 320, damping: 18 }}
         className="relative block aspect-[3/4] w-full rounded-[--radius-lg] [transform-style:preserve-3d]
-          focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-gold-400"
+          focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-premium-400"
       >
         <motion.div
           className="relative h-full w-full [transform-style:preserve-3d]"
@@ -179,7 +179,7 @@ function Sticker({
             <div className="absolute inset-x-0 bottom-0 p-3">
               <div className="mb-1 flex gap-1.5">
                 {model.premium && (
-                  <span className="rounded-full bg-gold-500 px-2 py-0.5 text-[0.5625rem] font-semibold tracking-wide text-on-gold">
+                  <span className="rounded-full bg-premium-500 px-2 py-0.5 text-[0.5625rem] font-semibold tracking-wide text-on-premium">
                     VIP
                   </span>
                 )}
@@ -199,7 +199,7 @@ function Sticker({
               [transform:rotateY(180deg)]"
           >
             <div>
-              <p className="font-display text-lg text-gold-400">{model.name}, {model.age}</p>
+              <p className="font-display text-lg text-premium-400">{model.name}, {model.age}</p>
               <p className="mt-1 text-xs text-fg-muted">{model.tagline}</p>
             </div>
             <dl className="space-y-1 text-[0.6875rem] text-fg-subtle">
@@ -209,7 +209,7 @@ function Sticker({
             <a
               href={`/modelos/${model.slug}`}
               onClick={(e) => e.stopPropagation()}
-              className="mt-2 inline-block rounded-[--radius-sm] bg-crimson-500 px-3 py-1.5 text-center text-xs font-medium text-on-crimson"
+              className="mt-2 inline-block rounded-[--radius-sm] bg-primary-500 px-3 py-1.5 text-center text-xs font-medium text-on-primary"
             >
               Ver perfil
             </a>

@@ -2,12 +2,12 @@
 import Badge from './Badge.astro';
 interface Props {
   eyebrow?: string;
-  eyebrowVariant?: 'crimson' | 'gold' | 'outline' | 'neutral';
+  eyebrowVariant?: 'primary' | 'premium' | 'outline' | 'neutral';
   title: string;
   id?: string;
   align?: 'left' | 'center';
 }
-const { eyebrow, eyebrowVariant = 'gold', title, id, align = 'left' } = Astro.props;
+const { eyebrow, eyebrowVariant = 'premium', title, id, align = 'left' } = Astro.props;
 ---
 <header
   class:list={[

@@ -46,9 +46,9 @@ const schemas = [
   <article>
     <Section as="header" class="pt-12 sm:pt-16" labelledby="profile-title">
       <nav aria-label="Ruta de navegación" class="mb-8 text-sm text-fg-subtle">
-        <a href="/" class="hover:text-gold-300">Inicio</a>
+        <a href="/" class="hover:text-premium-300">Inicio</a>
         <span class="px-2">/</span>
-        <a href="/#catalogo" class="hover:text-gold-300">Modelos</a>
+        <a href="/#catalogo" class="hover:text-premium-300">Modelos</a>
         <span class="px-2">/</span>
         <span class="text-fg-muted">{model.name}</span>
       </nav>
@@ -71,7 +71,7 @@ const schemas = [
 
         <div class="flex flex-col justify-center" data-reveal>
           <div class="mb-4 flex flex-wrap gap-2">
-            {model.premium && <Badge variant="gold">VIP</Badge>}
+            {model.premium && <Badge variant="premium">VIP</Badge>}
             <Badge variant="outline">{model.city}</Badge>
             {model.tags.map((t) => <Badge variant="neutral" size="sm">{t}</Badge>)}
           </div>
@@ -79,11 +79,11 @@ const schemas = [
           <h1 id="profile-title" class="text-4xl text-fg sm:text-5xl" transition:name={`title-${model.slug}`}>
             {model.name}<span class="font-sans text-2xl font-normal text-fg-muted">, {model.age}</span>
           </h1>
-          <p class="mt-3 font-display text-xl text-gold-400">{model.tagline}</p>
+          <p class="mt-3 font-display text-xl text-premium-400">{model.tagline}</p>
           <p class="mt-5 max-w-prose text-fg-muted">{model.bio}</p>
 
           <div class="mt-8 flex flex-wrap gap-4">
-            <Button variant="crimson" size="lg">Contactar</Button>
+            <Button variant="primary" size="lg">Contactar</Button>
             <Button href="/#catalogo" variant="ghost" size="lg">Volver al catálogo</Button>
           </div>
         </div>

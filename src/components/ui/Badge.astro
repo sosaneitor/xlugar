@@ -4,24 +4,28 @@
  * fills anywhere. Variants use brand tokens with real contrast.
  */
 interface Props {
-  variant?: 'crimson' | 'gold' | 'outline' | 'neutral';
+  variant?: 'primary' | 'premium' | 'accent' | 'success' | 'outline' | 'neutral';
   size?: 'sm' | 'md';
   class?: string;
 }
-const { variant = 'crimson', size = 'md', class: className = '' } = Astro.props;
+const { variant = 'primary', size = 'md', class: className = '' } = Astro.props;
 
 const base =
-  'inline-flex items-center gap-1.5 font-medium leading-none rounded-[--radius-pill] whitespace-nowrap';
+  'inline-flex items-center gap-1.5 font-semibold uppercase leading-none rounded-[--radius-pill] whitespace-nowrap';
 const sizes = {
-  sm: 'text-[0.6875rem] px-2.5 py-1 tracking-wide',
-  md: 'text-xs px-3 py-1.5 tracking-wide',
+  sm: 'text-[0.625rem] px-2.5 py-1 tracking-[0.08em]',
+  md: 'text-[0.6875rem] px-3 py-1.5 tracking-[0.08em]',
 };
 const variants = {
-  // solid crimson — default/action
-  crimson: 'bg-crimson-500 text-on-crimson',
+  // solid primary (hot pink) — default/action · TRENDING
+  primary: 'bg-primary-500 text-on-primary',
   // solid champagne gold — premium / VIP
-  gold: 'bg-gold-500 text-on-gold',
-  // solid border, solid bg surface (NOT transparent)
+  premium: 'bg-premium-500 text-on-premium',
+  // solid electric violet — NUEVO
+  accent: 'bg-accent-500 text-on-primary',
+  // solid border + green text — ONLINE (no transparency tricks)
+  success: 'bg-surface text-success border border-success',
+  // solid border, solid bg surface (NOT transparent) — VERIFICADO
   outline: 'bg-surface text-fg border border-border-strong',
   neutral: 'bg-surface-2 text-fg-muted',
 };

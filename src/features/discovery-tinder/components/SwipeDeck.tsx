@@ -161,7 +161,7 @@ function Card({
         </motion.span>
         <motion.span
           style={{ opacity: nopeOpacity }}
-          className="absolute left-4 top-4 -rotate-12 rounded-md bg-nope px-3 py-1 text-sm font-bold uppercase tracking-widest text-on-crimson"
+          className="absolute left-4 top-4 -rotate-12 rounded-md bg-nope px-3 py-1 text-sm font-bold uppercase tracking-widest text-on-primary"
         >
           Nope
         </motion.span>
@@ -169,7 +169,7 @@ function Card({
         <div className="absolute inset-x-0 bottom-0 p-5">
           <div className="mb-2 flex gap-2">
             {model.premium && (
-              <span className="rounded-full bg-gold-500 px-2.5 py-1 text-[0.6875rem] font-medium tracking-wide text-on-gold">
+              <span className="rounded-full bg-premium-500 px-2.5 py-1 text-[0.6875rem] font-medium tracking-wide text-on-premium">
                 VIP
               </span>
             )}
@@ -209,7 +209,7 @@ function ActionButton({
   const toneCls =
     tone === 'like'
       ? 'border-like text-like hover:bg-like hover:text-bg'
-      : 'border-nope text-nope hover:bg-nope hover:text-on-crimson';
+      : 'border-nope text-nope hover:bg-nope hover:text-on-primary';
   return (
     <button
       type="button"
@@ -217,7 +217,7 @@ function ActionButton({
       onClick={onClick}
       className={`grid h-14 w-14 place-items-center rounded-full border-2 bg-surface text-2xl
         transition-[transform,background-color,color] duration-150 hover:-translate-y-1 active:scale-90
-        focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-gold-400
+        focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-premium-400
         motion-reduce:transform-none ${toneCls}`}
     >
       {children}
@@ -238,7 +238,7 @@ function EmptyState({ likedCount, onReset }: { likedCount: number; onReset: () =
         <button
           type="button"
           onClick={onReset}
-          className="mt-5 rounded-[--radius-md] bg-crimson-500 px-5 py-2.5 text-sm font-medium text-on-crimson transition-transform hover:-translate-y-0.5 motion-reduce:transform-none"
+          className="mt-5 rounded-[--radius-md] bg-primary-500 px-5 py-2.5 text-sm font-medium text-on-primary transition-transform hover:-translate-y-0.5 motion-reduce:transform-none"
         >
           Reiniciar
         </button>
