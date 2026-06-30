@@ -1,7 +1,7 @@
 ---
 import Button from '@components/ui/Button.astro';
 import Badge from '@components/ui/Badge.astro';
-import { buildAffiliateLink } from '@features/affiliate/utils/affiliate';
+import { buildRetentionLink } from '@features/affiliate/utils/whiteLabel';
 ---
 <section class="relative isolate overflow-hidden" aria-labelledby="hero-title">
   {/* Decorative parallax glow layers — transform-only, behind content */}
@@ -45,7 +45,7 @@ import { buildAffiliateLink } from '@features/affiliate/utils/affiliate';
 
     <div class="mt-9 flex flex-wrap items-center justify-center gap-4" data-reveal style="--reveal-delay: 180ms">
       <Button
-        href={buildAffiliateLink('home', 'home')}
+        href={buildRetentionLink('home')}
         variant="gradient"
         size="lg"
         rel="sponsored noopener noreferrer"

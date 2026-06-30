@@ -1,5 +1,6 @@
 import { useMemo, useState } from 'react';
 import { useRooms } from '../hooks/useRooms';
+import { buildRoomLink } from '@features/affiliate/utils/whiteLabel';
 import type { ChaturbateRoom, Gender } from '../types/room';
 
 interface LiveCatalogProps {
@@ -30,10 +31,12 @@ function RoomCard({ room, cacheBust }: { room: ChaturbateRoom; cacheBust: number
   const img = src ? `${src}${src.includes('?') ? '&' : '?'}t=${cacheBust}` : '';
   const tags = room.tags.slice(0, 3);
   const place = room.location || room.country;
+  // Route through the White Label room when configured; else the API revshare link.
+  const href = buildRoomLink(room.username, room.chat_room_url_revshare, 'catalog');
   return (
     <li>
       <a
-        href={room.chat_room_url_revshare}
+        href={href}
         target="_blank"
         rel="sponsored noopener noreferrer"
         className="group relative block overflow-hidden rounded-(--radius-lg) border border-border bg-surface

@@ -8,7 +8,7 @@ import SectionHeading from '@components/ui/SectionHeading.astro';
 import Button from '@components/ui/Button.astro';
 import LiveCatalog from '@features/catalog/components/LiveCatalog.tsx';
 import { FEATURED_CATEGORIES } from '@features/catalog/data/categories';
-import { buildAffiliateLink } from '@features/affiliate/utils/affiliate';
+import { buildRetentionLink } from '@features/affiliate/utils/whiteLabel';
 import { SITE } from '@lib/site';
 ---
 <BaseLayout
@@ -63,7 +63,7 @@ import { SITE } from '@lib/site';
     <div class="mx-auto flex max-w-2xl flex-col items-center gap-6 text-center">
       <h2 id="join-title" class="text-3xl text-fg sm:text-4xl">Thousands of models are live right now</h2>
       <p class="text-fg-muted">Free to watch, no account required to start. Step inside and find your favorite.</p>
-      <Button href={buildAffiliateLink('home', 'home')} variant="primary" size="lg">Enter live cams</Button>
+      <Button href={buildRetentionLink('home')} variant="primary" size="lg" rel="sponsored noopener noreferrer" target="_blank">Enter live cams</Button>
     </div>
   </Section>
 

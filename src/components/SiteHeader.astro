@@ -1,6 +1,5 @@
 ---
-import { buildWhiteLabelLink, hasWhiteLabel } from '@features/affiliate/utils/whiteLabel';
-import { buildAffiliateLink } from '@features/affiliate/utils/affiliate';
+import { buildRetentionLink } from '@features/affiliate/utils/whiteLabel';
 
 const links = [
   { href: '/models', label: 'Models' },
@@ -11,7 +10,7 @@ const links = [
 
 // Primary CTA routes to the White Label retention destination when configured,
 // otherwise falls back to the affiliate home tour so the button always works.
-const ctaHref = hasWhiteLabel ? buildWhiteLabelLink({ track: 'home' }) : buildAffiliateLink('home', 'home');
+const ctaHref = buildRetentionLink('home');
 const ctaExternal = true;
 ---
 <header class="sticky top-0 z-50 border-b border-border bg-bg/100">
