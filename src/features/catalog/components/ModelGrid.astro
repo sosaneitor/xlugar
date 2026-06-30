@@ -1,0 +1,22 @@
+---
+import ModelCard from './ModelCard.astro';
+import type { Model } from '@data/model.schema';
+
+interface Props {
+  models: Model[];
+  /** Number of leading cards to eager-load (above the fold). */
+  priorityCount?: number;
+}
+const { models, priorityCount = 0 } = Astro.props;
+---
+<ul
+  class="grid grid-cols-2 gap-4 sm:grid-cols-3 lg:grid-cols-4 sm:gap-5"
+  data-reveal-group
+  data-reveal-step="70"
+>
+  {models.map((model, i) => (
+    <li>
+      <ModelCard model={model} priority={i < priorityCount} />
+    </li>
+  ))}
+</ul>

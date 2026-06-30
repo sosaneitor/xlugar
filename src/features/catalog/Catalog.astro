@@ -1,0 +1,23 @@
+---
+import Section from '@components/ui/Section.astro';
+import SectionHeading from '@components/ui/SectionHeading.astro';
+import ModelGrid from './components/ModelGrid.astro';
+import type { Model } from '@data/model.schema';
+
+interface Props { models: Model[] }
+const { models } = Astro.props;
+---
+<Section id="catalogo" labelledby="catalogo-title" class="bg-bg-elev">
+  <SectionHeading
+    eyebrow="Catálogo"
+    eyebrowVariant="outline"
+    title="Todas las modelos"
+    id="catalogo-title"
+  >
+    <p class="text-fg-muted">Explora el catálogo completo. Cada perfil, una experiencia.</p>
+  </SectionHeading>
+
+  <div class="mt-10">
+    <ModelGrid models={models} priorityCount={0} />
+  </div>
+</Section>

@@ -1,0 +1,30 @@
+---
+import BaseLayout from '@layouts/BaseLayout.astro';
+import SiteHeader from '@components/SiteHeader.astro';
+import SiteFooter from '@components/SiteFooter.astro';
+import Hero from '@features/landing/Hero.astro';
+import Discovery from '@features/discovery-tinder/Discovery.astro';
+import Feed from '@features/feed-tiktok/Feed.astro';
+import Album from '@features/album-figuritas/Album.astro';
+import Catalog from '@features/catalog/Catalog.astro';
+import { getModels } from '@data/getModels';
+import { SITE } from '@lib/site';
+
+const models = await getModels();
+---
+<BaseLayout
+  title={`${SITE.name} — Descubre, desliza, colecciona`}
+  rawTitle
+  description={SITE.defaultDescription}
+  type="website"
+>
+  <SiteHeader slot="header" />
+
+  <Hero />
+  <Discovery models={models} />
+  <Feed models={models} />
+  <Album models={models} />
+  <Catalog models={models} />
+
+  <SiteFooter slot="footer" />
+</BaseLayout>
