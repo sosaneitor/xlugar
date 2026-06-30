@@ -1,55 +1,76 @@
 /* =============================================================
    xLugar — DESIGN TOKENS (single source of truth)
-   Swap these values when the Lovable export/screenshots arrive;
-   the whole UI inherits them. No component hardcodes a color.
-   Dark-luxe / sensual direction: near-black canvas, crimson action,
-   champagne gold for premium/VIP.
+   Reconciled to the Lovable design system (dark-luxe / neon noir):
+   warm noir canvas, hot-pink primary, electric-violet accent, coral,
+   champagne gold for premium/VIP, holographic gradient.
+   No component hardcodes a color — change values here only.
    ============================================================= */
 
 :root {
-  /* --- Surfaces (warm near-black) --- */
-  --c-bg: #0b0809;
-  --c-bg-elev: #141011;
-  --c-surface: #1b1517;
-  --c-surface-2: #241c1f;
-  --c-border: #342a2d;
-  --c-border-strong: #4a3b3f;
+  /* --- Surfaces (warm noir) --- */
+  --c-bg: #17090f; /* --background · noir cálido base */
+  --c-surface: #271820; /* --surface · tarjetas */
+  --c-surface-elevated: #31202a; /* --surface-elevated · tarjetas flotantes */
+  --c-surface-overlay: #3b2733; /* --surface-overlay · overlays */
+  --c-muted: #2a1a22; /* --muted · fondos secundarios */
+  --c-border: #3a2730;
+  --c-border-strong: #4e3a44; /* --border-strong · líneas con énfasis */
 
-  /* --- Brand: crimson (action / primary) --- */
-  --c-crimson-50: #fdeaee;
-  --c-crimson-300: #e8536f;
-  --c-crimson-500: #c81e3a; /* base */
-  --c-crimson-600: #ab1531;
-  --c-crimson-700: #870f26;
+  /* --- Primary: hot pink / magenta (CTAs · marca) --- */
+  --c-primary-300: #ff7ba6;
+  --c-primary: #ff1466; /* --primary */
+  --c-primary-glow: #ff5e8f; /* --primary-glow · hover */
+  --c-primary-600: #e60c57;
+  --c-primary-700: #b80845;
 
-  /* --- Premium: champagne gold (VIP / premium) --- */
-  --c-gold-300: #ecd7a8;
-  --c-gold-400: #ddbd80;
-  --c-gold-500: #cda35c; /* base */
-  --c-gold-600: #b1863f;
+  /* --- Accent: electric violet --- */
+  --c-accent-400: #b768ff;
+  --c-accent: #a23dff; /* --accent · violeta eléctrico */
+  --c-accent-600: #8a22ee;
+
+  /* --- Coral neon --- */
+  --c-coral: #ff6e6e; /* --accent-coral */
+
+  /* --- Premium: champagne gold (VIP · premium) --- */
+  --c-premium-300: #f2d49a;
+  --c-premium-400: #ecc578;
+  --c-premium: #e6b85c; /* --premium */
+  --c-premium-600: #c8973c;
 
   /* --- Text --- */
-  --c-fg: #f6efe9;
-  --c-fg-muted: #b9aaa3;
-  --c-fg-subtle: #837571;
-  --c-on-crimson: #fff5f6;
-  --c-on-gold: #2a1d06;
+  --c-fg: #f8eef1; /* --foreground */
+  --c-fg-muted: #bba6ac; /* --muted-foreground · texto secundario */
+  --c-fg-subtle: #8a7780;
+  --c-on-primary: #ffffff;
+  --c-on-premium: #2a1d06;
 
-  /* --- Feedback (used by Tinder overlays, status) --- */
-  --c-like: #2fbf71;
-  --c-nope: #e8536f;
+  /* --- Status --- */
+  --c-success: #3ddc97; /* online */
+  --c-warning: #ffb02e; /* aviso */
+  --c-danger: #ed3a40; /* error */
+  /* Tinder feedback semantics */
+  --c-like: var(--c-success);
+  --c-nope: var(--c-danger);
+
+  /* --- Gradients --- */
+  --gradient-brand: linear-gradient(135deg, #ff1466 0%, #a23dff 100%);
+  --gradient-ember: linear-gradient(135deg, #ff2d6b 0%, #ff6e6e 52%, #ffa24c 100%);
+  --gradient-holo: linear-gradient(115deg, #b7a6ff 0%, #6fe6ff 45%, #ffe08a 100%);
 
   /* --- Radii --- */
-  --radius-sm: 0.375rem;
-  --radius-md: 0.625rem;
-  --radius-lg: 1rem;
+  --radius-sm: 0.5rem;
+  --radius-md: 0.75rem;
+  --radius-lg: 1.125rem;
   --radius-xl: 1.5rem;
+  --radius-2xl: 2rem;
   --radius-pill: 9999px;
 
   /* --- Elevation (defined, never animated in a loop) --- */
-  --shadow-card: 0 10px 30px -12px rgb(0 0 0 / 0.7);
-  --shadow-glow-crimson: 0 0 0 1px var(--c-crimson-600), 0 8px 30px -8px rgb(200 30 58 / 0.45);
-  --shadow-glow-gold: 0 0 0 1px var(--c-gold-600), 0 8px 30px -8px rgb(205 163 92 / 0.4);
+  --shadow-md: 0 6px 20px -8px rgb(0 0 0 / 0.6);
+  --shadow-card: 0 14px 40px -16px rgb(0 0 0 / 0.75);
+  --shadow-glow-primary: 0 0 0 1px rgb(255 20 102 / 0.5), 0 12px 40px -8px rgb(255 20 102 / 0.45);
+  --shadow-glow-accent: 0 0 0 1px rgb(162 61 255 / 0.5), 0 12px 40px -8px rgb(162 61 255 / 0.45);
+  --shadow-glow-premium: 0 0 0 1px rgb(230 184 92 / 0.5), 0 12px 40px -8px rgb(230 184 92 / 0.4);
 
   /* --- Motion timing (shared by CSS + islands) --- */
   --ease-out-soft: cubic-bezier(0.22, 1, 0.36, 1);
@@ -59,7 +80,7 @@
   --dur-slow: 560ms;
 
   /* --- Fonts (families; faces declared below) --- */
-  --font-display: 'Fraunces', ui-serif, Georgia, 'Times New Roman', serif;
+  --font-display: 'Syne', ui-sans-serif, system-ui, sans-serif;
   --font-sans: 'Inter', ui-sans-serif, system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif;
 
   color-scheme: dark;
@@ -67,8 +88,8 @@
 
 /* =============================================================
    Self-hosted fonts (font-display: swap). Files in /public/fonts.
-   Only the weights actually used are loaded; the LCP weight is
-   preloaded from <head>.
+   The display font (Syne) carries the LCP heading and is preloaded
+   from <head>.
    ============================================================= */
 
 @font-face {
@@ -80,9 +101,9 @@
 }
 
 @font-face {
-  font-family: 'Fraunces';
+  font-family: 'Syne';
   font-style: normal;
-  font-weight: 400 900;
+  font-weight: 400 800;
   font-display: swap;
-  src: url('/fonts/fraunces-var.woff2') format('woff2');
+  src: url('/fonts/syne-var.woff2') format('woff2');
 }

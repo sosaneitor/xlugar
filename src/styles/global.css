@@ -8,29 +8,42 @@
    ============================================================= */
 @theme {
   --color-bg: var(--c-bg);
-  --color-bg-elev: var(--c-bg-elev);
+  --color-bg-elev: var(--c-surface-elevated);
   --color-surface: var(--c-surface);
-  --color-surface-2: var(--c-surface-2);
+  --color-surface-2: var(--c-surface-overlay);
+  --color-muted: var(--c-muted);
   --color-border: var(--c-border);
   --color-border-strong: var(--c-border-strong);
 
-  --color-crimson-50: var(--c-crimson-50);
-  --color-crimson-300: var(--c-crimson-300);
-  --color-crimson-500: var(--c-crimson-500);
-  --color-crimson-600: var(--c-crimson-600);
-  --color-crimson-700: var(--c-crimson-700);
+  /* primary — hot pink (CTAs / marca) */
+  --color-primary-300: var(--c-primary-300);
+  --color-primary-500: var(--c-primary);
+  --color-primary-glow: var(--c-primary-glow);
+  --color-primary-600: var(--c-primary-600);
+  --color-primary-700: var(--c-primary-700);
 
-  --color-gold-300: var(--c-gold-300);
-  --color-gold-400: var(--c-gold-400);
-  --color-gold-500: var(--c-gold-500);
-  --color-gold-600: var(--c-gold-600);
+  /* accent — electric violet */
+  --color-accent-400: var(--c-accent-400);
+  --color-accent-500: var(--c-accent);
+  --color-accent-600: var(--c-accent-600);
+
+  --color-coral: var(--c-coral);
+
+  /* premium — champagne gold (VIP / premium) */
+  --color-premium-300: var(--c-premium-300);
+  --color-premium-400: var(--c-premium-400);
+  --color-premium-500: var(--c-premium);
+  --color-premium-600: var(--c-premium-600);
 
   --color-fg: var(--c-fg);
   --color-fg-muted: var(--c-fg-muted);
   --color-fg-subtle: var(--c-fg-subtle);
-  --color-on-crimson: var(--c-on-crimson);
-  --color-on-gold: var(--c-on-gold);
+  --color-on-primary: var(--c-on-primary);
+  --color-on-premium: var(--c-on-premium);
 
+  --color-success: var(--c-success);
+  --color-warning: var(--c-warning);
+  --color-danger: var(--c-danger);
   --color-like: var(--c-like);
   --color-nope: var(--c-nope);
 
@@ -38,6 +51,7 @@
   --radius-md: var(--radius-md);
   --radius-lg: var(--radius-lg);
   --radius-xl: var(--radius-xl);
+  --radius-2xl: var(--radius-2xl);
 
   --font-display: var(--font-display);
   --font-sans: var(--font-sans);
@@ -150,14 +164,9 @@ img, picture, video {
   inset: 0;
   pointer-events: none;
   border-radius: inherit;
-  background:
-    linear-gradient(115deg,
-      rgba(255, 0, 128, 0.18),
-      rgba(0, 200, 255, 0.18) 30%,
-      rgba(205, 163, 92, 0.22) 55%,
-      rgba(120, 0, 255, 0.18) 80%);
-  mix-blend-mode: screen;
-  opacity: 0.7;
+  background: var(--gradient-holo);
+  mix-blend-mode: color-dodge;
+  opacity: 0.55;
 }
 .foil-sheen {
   position: absolute;
