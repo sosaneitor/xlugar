@@ -1,24 +1,35 @@
 ---
 import { SITE } from '@lib/site';
 const year = 2026;
+const nav = [
+  { href: '/models', label: 'Models' },
+  { href: '/blog', label: 'Blog' },
+  { href: '/about', label: 'About' },
+];
 ---
 <footer class="border-t border-border bg-bg-elev">
   <div class="mx-auto flex max-w-6xl flex-col gap-6 px-5 py-12 sm:flex-row sm:items-center sm:justify-between sm:px-8">
     <div>
       <p class="font-display text-lg text-fg">x<span class="text-primary-500">Lugar</span></p>
-      <p class="mt-1 text-sm text-fg-subtle">Experiencia premium · solo +18</p>
+      <p class="mt-1 text-sm text-fg-subtle">Live cam discovery · 18+ only</p>
     </div>
-    <nav aria-label="Pie de página">
+    <nav aria-label="Footer">
       <ul class="flex flex-wrap gap-x-6 gap-y-2 text-sm text-fg-muted">
-        <li><a href="/#catalogo" class="hover:text-premium-300">Catálogo</a></li>
-        <li><a href="/legal/privacidad" class="hover:text-premium-300">Privacidad</a></li>
-        <li><a href="/legal/terminos" class="hover:text-premium-300">Términos</a></li>
+        {nav.map((l) => (
+          <li><a href={l.href} class="hover:text-premium-300">{l.label}</a></li>
+        ))}
+        <li><a href="/about" class="hover:text-premium-300">Privacy</a></li>
+        <li><a href="/about" class="hover:text-premium-300">Terms</a></li>
       </ul>
     </nav>
   </div>
   <div class="border-t border-border">
-    <p class="mx-auto max-w-6xl px-5 py-4 text-xs text-fg-subtle sm:px-8">
-      © {year} {SITE.name}. Todos los derechos reservados.
-    </p>
+    <div class="mx-auto max-w-6xl px-5 py-4 sm:px-8">
+      <p class="text-xs text-fg-subtle">
+        © {year} {SITE.name}. All rights reserved. This site contains adult content and is intended for adults
+        18 years or older (21 where required). All models are verified adults. {SITE.name} participates in the
+        Chaturbate affiliate program and may earn a commission from links on this site.
+      </p>
+    </div>
   </div>
 </footer>

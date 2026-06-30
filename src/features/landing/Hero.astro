@@ -1,6 +1,7 @@
 ---
 import Button from '@components/ui/Button.astro';
 import Badge from '@components/ui/Badge.astro';
+import { buildAffiliateLink } from '@features/affiliate/utils/affiliate';
 ---
 <section class="relative isolate overflow-hidden" aria-labelledby="hero-title">
   {/* Decorative parallax glow layers — transform-only, behind content */}
@@ -17,7 +18,7 @@ import Badge from '@components/ui/Badge.astro';
 
   <div class="mx-auto flex max-w-6xl flex-col items-center px-5 pb-12 pt-24 text-center sm:px-8 sm:pt-32">
     <div data-reveal>
-      <Badge variant="premium" size="md">Catálogo premium · +18</Badge>
+      <Badge variant="premium" size="md">Live cams · 18+</Badge>
     </div>
 
     <h1
@@ -27,9 +28,9 @@ import Badge from '@components/ui/Badge.astro';
       style="--reveal-delay: 60ms"
       transition:name="hero-title"
     >
-      Descubre. Desliza.
+      Thousands of models,
       <span class="bg-clip-text text-transparent [background-image:var(--gradient-brand)]">
-        Colecciona.
+        live right now.
       </span>
     </h1>
 
@@ -38,13 +39,21 @@ import Badge from '@components/ui/Badge.astro';
       data-reveal
       style="--reveal-delay: 120ms"
     >
-      Tres formas de explorar nuestro catálogo: descubrimiento al deslizar, feed vertical
-      y un álbum coleccionable. Una experiencia dark-luxe, pensada para el móvil.
+      A real-time catalog of live cam models, ranked by who's drawing the biggest crowd this minute and
+      refreshed continuously. Free to watch — find your room in seconds.
     </p>
 
     <div class="mt-9 flex flex-wrap items-center justify-center gap-4" data-reveal style="--reveal-delay: 180ms">
-      <Button href="#descubre" variant="gradient" size="lg">Empezar a descubrir</Button>
-      <Button href="#catalogo" variant="ghost" size="lg">Ver catálogo</Button>
+      <Button
+        href={buildAffiliateLink('home', 'home')}
+        variant="gradient"
+        size="lg"
+        rel="sponsored noopener noreferrer"
+        target="_blank"
+      >
+        Enter live cams
+      </Button>
+      <Button href="/models" variant="ghost" size="lg">Browse the catalog</Button>
     </div>
   </div>
 </section>

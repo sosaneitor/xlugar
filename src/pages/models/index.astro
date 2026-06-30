@@ -1,0 +1,67 @@
+---
+import BaseLayout from '@layouts/BaseLayout.astro';
+import SiteHeader from '@components/SiteHeader.astro';
+import SiteFooter from '@components/SiteFooter.astro';
+import Section from '@components/ui/Section.astro';
+import LiveCatalog from '@features/catalog/components/LiveCatalog.tsx';
+import AdSlot from '@features/ads/components/AdSlot.astro';
+import { CATEGORIES } from '@features/catalog/data/categories';
+import { breadcrumbSchema } from '@lib/schema';
+
+const breadcrumbs = breadcrumbSchema([
+  { name: 'Home', path: '/' },
+  { name: 'Models', path: '/models' },
+]);
+---
+<BaseLayout
+  title="Live Cam Models — Full Catalog Online Now"
+  description="Browse every cam model online right now. A real-time catalog ranked by viewers, with language, category and audience filters. Refreshed every 60 seconds. 18+."
+  canonical="/models"
+  schemas={[breadcrumbs]}
+>
+  <SiteHeader slot="header" />
+
+  <Section labelledby="models-title">
+    <header class="flex flex-col gap-4" data-reveal>
+      <nav aria-label="Breadcrumb" class="text-sm text-fg-subtle">
+        <a href="/" class="hover:text-premium-300">Home</a> <span aria-hidden="true">/</span> <span class="text-fg-muted">Models</span>
+      </nav>
+      <h1 class="text-4xl text-fg sm:text-5xl">Live cam models online now</h1>
+      <p class="max-w-2xl text-fg-muted">
+        The full live catalog, ranked by current viewers and refreshed every minute. Filter by language, who's
+        on camera, or minimum audience to find the right room fast.
+      </p>
+    </header>
+
+    <div class="mt-10 grid gap-8 lg:grid-cols-[1fr_300px]">
+      <div>
+        <LiveCatalog client:visible pageSize={24} adEvery={12} />
+      </div>
+      <aside class="hidden lg:block">
+        <div class="sticky top-24">
+          <AdSlot variant="sidebar" slotId="models-sidebar" />
+        </div>
+      </aside>
+    </div>
+
+    {/* Internal links to categories aid crawl + indexation */}
+    <nav class="mt-14 border-t border-border pt-8" aria-label="Categories">
+      <h2 class="text-sm uppercase tracking-[0.14em] text-fg-subtle">Browse by category</h2>
+      <ul class="mt-4 flex flex-wrap gap-3">
+        {CATEGORIES.map((c) => (
+          <li>
+            <a
+              href={`/models/${c.slug}`}
+              class="rounded-(--radius-pill) border border-border-strong bg-surface px-4 py-2 text-sm text-fg-muted
+                     transition-colors duration-(--dur-fast) hover:border-premium-500 hover:text-premium-300"
+            >
+              {c.label}
+            </a>
+          </li>
+        ))}
+      </ul>
+    </nav>
+  </Section>
+
+  <SiteFooter slot="footer" />
+</BaseLayout>

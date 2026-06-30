@@ -7,6 +7,10 @@ import JsonLd from '@components/seo/JsonLd.astro';
 import Motion from '@components/Motion.astro';
 import '@styles/global.css';
 
+// Analytics / tag manager IDs — both optional; markup is a no-op when unset.
+const GA_ID = import.meta.env.PUBLIC_GA_MEASUREMENT_ID?.trim();
+const GTM_ID = import.meta.env.PUBLIC_GTM_ID?.trim();
+
 interface Props {
   title: string;
   description?: string;
@@ -62,11 +66,27 @@ const {
     <JsonLd schema={websiteSchema()} />
     {schemas.map((s) => <JsonLd schema={s} />)}
 
+    {/* Google Tag Manager (placeholder container — fill in GTM) */}
+    {GTM_ID && (
+      <script is:inline set:html={`(function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start':new Date().getTime(),event:'gtm.js'});var f=d.getElementsByTagName(s)[0],j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src='https://www.googletagmanager.com/gtm.js?id='+i+dl;f.parentNode.insertBefore(j,f);})(window,document,'script','dataLayer','${GTM_ID}');`} />
+    )}
+
+    {/* Google Analytics 4 */}
+    {GA_ID && (
+      <>
+        <script is:inline async src={`https://www.googletagmanager.com/gtag/js?id=${GA_ID}`}></script>
+        <script is:inline set:html={`window.dataLayer=window.dataLayer||[];function gtag(){dataLayer.push(arguments);}gtag('js',new Date());gtag('config','${GA_ID}');`} />
+      </>
+    )}
+
     {/* Smooth client-side navigation + shared-element transitions */}
     <ClientRouter />
   </head>
   <body>
-    <a href="#main" class="sr-only focus:not-sr-only">Saltar al contenido</a>
+    {GTM_ID && (
+      <noscript set:html={`<iframe src="https://www.googletagmanager.com/ns.html?id=${GTM_ID}" height="0" width="0" style="display:none;visibility:hidden"></iframe>`} />
+    )}
+    <a href="#main" class="sr-only focus:not-sr-only">Skip to content</a>
     <slot name="header" />
     <main id="main">
       <slot />

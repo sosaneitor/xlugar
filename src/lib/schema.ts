@@ -8,14 +8,6 @@ export function websiteSchema() {
     name: SITE.name,
     url: SITE.url,
     inLanguage: SITE.lang,
-    potentialAction: {
-      '@type': 'SearchAction',
-      target: {
-        '@type': 'EntryPoint',
-        urlTemplate: `${SITE.url}/buscar?q={search_term_string}`,
-      },
-      'query-input': 'required name=search_term_string',
-    },
   };
 }
 
@@ -32,34 +24,33 @@ export function breadcrumbSchema(items: { name: string; path: string }[]) {
   };
 }
 
-interface ProfileInput {
-  name: string;
-  slug: string;
+interface ArticleInput {
+  title: string;
   description: string;
-  image: string;
-  city?: string;
+  path: string;
+  datePublished: string;
+  dateModified?: string;
+  image?: string;
 }
 
-/** ProfilePage with an embedded Person, plus a primary ImageObject. */
-export function profileSchema(p: ProfileInput) {
-  const url = absoluteUrl(`/modelos/${p.slug}`);
+/** Article schema for blog posts. */
+export function articleSchema(a: ArticleInput) {
+  const url = absoluteUrl(a.path);
   return {
     '@context': 'https://schema.org',
-    '@type': 'ProfilePage',
-    url,
+    '@type': 'Article',
+    headline: a.title,
+    description: a.description,
     inLanguage: SITE.lang,
-    mainEntity: {
-      '@type': 'Person',
-      name: p.name,
-      description: p.description,
-      url,
-      image: {
-        '@type': 'ImageObject',
-        url: absoluteUrl(p.image),
-        contentUrl: absoluteUrl(p.image),
-        caption: p.name,
-      },
-      ...(p.city ? { homeLocation: { '@type': 'Place', name: p.city } } : {}),
+    url,
+    mainEntityOfPage: url,
+    datePublished: a.datePublished,
+    dateModified: a.dateModified ?? a.datePublished,
+    ...(a.image ? { image: absoluteUrl(a.image) } : {}),
+    publisher: {
+      '@type': 'Organization',
+      name: SITE.name,
+      url: SITE.url,
     },
   };
 }

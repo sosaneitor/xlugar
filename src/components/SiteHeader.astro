@@ -1,14 +1,21 @@
 ---
-import { SITE } from '@lib/site';
+import { buildWhiteLabelLink, hasWhiteLabel } from '@features/affiliate/utils/whiteLabel';
+import { buildAffiliateLink } from '@features/affiliate/utils/affiliate';
+
 const links = [
-  { href: '/#descubre', label: 'Descubre' },
-  { href: '/#feed', label: 'Feed' },
-  { href: '/#album', label: 'Álbum' },
-  { href: '/#catalogo', label: 'Catálogo' },
+  { href: '/models', label: 'Models' },
+  { href: '/models/latina', label: 'Categories' },
+  { href: '/blog', label: 'Blog' },
+  { href: '/about', label: 'About' },
 ];
+
+// Primary CTA routes to the White Label retention destination when configured,
+// otherwise falls back to the affiliate home tour so the button always works.
+const ctaHref = hasWhiteLabel ? buildWhiteLabelLink({ track: 'home' }) : buildAffiliateLink('home', 'home');
+const ctaExternal = true;
 ---
 <header class="sticky top-0 z-50 border-b border-border bg-bg/100">
-  <nav class="mx-auto flex h-16 max-w-6xl items-center justify-between px-5 sm:px-8" aria-label="Principal">
+  <nav class="mx-auto flex h-16 max-w-6xl items-center justify-between px-5 sm:px-8" aria-label="Primary">
     <a href="/" class="font-display text-xl tracking-tight text-fg" transition:name="brand">
       x<span class="text-primary-500">Lugar</span>
     </a>
@@ -20,12 +27,14 @@ const links = [
       ))}
     </ul>
     <a
-      href="/#descubre"
+      href={ctaHref}
+      rel={ctaExternal ? 'sponsored noopener noreferrer' : undefined}
+      target={ctaExternal ? '_blank' : undefined}
       class="rounded-(--radius-md) bg-primary-500 px-4 py-2 text-sm font-medium text-on-primary
              transition-[transform,background-color] duration-(--dur-fast) hover:-translate-y-0.5
              hover:bg-primary-600 motion-reduce:transform-none"
     >
-      Entrar
+      Enter live
     </a>
   </nav>
 </header>

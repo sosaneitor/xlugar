@@ -14,15 +14,18 @@ export default defineConfig({
   site: SITE,
   output: 'static',
   adapter: netlify(),
-  integrations: [react(), sitemap()],
+  integrations: [
+    react(),
+    sitemap({
+      // The on-demand proxy route is not a page — keep it out of the sitemap.
+      filter: (page) => !page.includes('/api/'),
+    }),
+  ],
   vite: {
     plugins: [tailwindcss()],
   },
-  image: {
-    // Allow build-time optimization (AVIF/WebP) of the mock placeholder images.
-    // Swap these patterns for the real media host when the API is wired in.
-    remotePatterns: [{ protocol: 'https', hostname: 'picsum.photos' }],
-  },
+  // Room thumbnails are external, self-refreshing JPEG snapshots — we render
+  // them with plain <img>, not the Image optimizer, so no remotePatterns needed.
   prefetch: {
     prefetchAll: true,
     defaultStrategy: 'viewport',

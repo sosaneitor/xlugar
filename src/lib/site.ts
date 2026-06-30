@@ -5,11 +5,11 @@
 export const SITE = {
   url: (import.meta.env.PUBLIC_SITE_URL ?? 'https://xlugar.com').replace(/\/$/, ''),
   name: import.meta.env.PUBLIC_SITE_NAME ?? 'xLugar',
-  locale: import.meta.env.PUBLIC_SITE_LOCALE ?? 'es_ES',
-  lang: (import.meta.env.PUBLIC_SITE_LOCALE ?? 'es_ES').split('_')[0] || 'es',
+  locale: import.meta.env.PUBLIC_SITE_LOCALE ?? 'en_US',
+  lang: (import.meta.env.PUBLIC_SITE_LOCALE ?? 'en_US').split('_')[0] || 'en',
   twitter: import.meta.env.PUBLIC_TWITTER_HANDLE ?? '@xlugar',
   defaultDescription:
-    'xLugar — catálogo de modelos con descubrimiento interactivo, feed vertical y álbum coleccionable. Experiencia premium, dark-luxe.',
+    'xLugar — discover live cam models streaming right now. Browse a real-time catalog and curated categories, updated every minute. 18+ only.',
   defaultOgImage: '/og/default.jpg',
 } as const;
 

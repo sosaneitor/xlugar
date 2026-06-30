@@ -3,17 +3,16 @@ import BaseLayout from '@layouts/BaseLayout.astro';
 import SiteHeader from '@components/SiteHeader.astro';
 import SiteFooter from '@components/SiteFooter.astro';
 import Hero from '@features/landing/Hero.astro';
-import Discovery from '@features/discovery-tinder/Discovery.astro';
-import Feed from '@features/feed-tiktok/Feed.astro';
-import Album from '@features/album-figuritas/Album.astro';
-import Catalog from '@features/catalog/Catalog.astro';
-import { getModels } from '@data/getModels';
+import Section from '@components/ui/Section.astro';
+import SectionHeading from '@components/ui/SectionHeading.astro';
+import Button from '@components/ui/Button.astro';
+import LiveCatalog from '@features/catalog/components/LiveCatalog.tsx';
+import { FEATURED_CATEGORIES } from '@features/catalog/data/categories';
+import { buildAffiliateLink } from '@features/affiliate/utils/affiliate';
 import { SITE } from '@lib/site';
-
-const models = await getModels();
 ---
 <BaseLayout
-  title={`${SITE.name} — Descubre, desliza, colecciona`}
+  title={`${SITE.name} — Live Cam Models Online Now`}
   rawTitle
   description={SITE.defaultDescription}
   type="website"
@@ -21,10 +20,52 @@ const models = await getModels();
   <SiteHeader slot="header" />
 
   <Hero />
-  <Discovery models={models} />
-  <Feed models={models} />
-  <Album models={models} />
-  <Catalog models={models} />
+
+  {/* Live models — top rooms by current viewers */}
+  <Section id="live" labelledby="live-title" class="bg-bg-elev">
+    <SectionHeading eyebrow="Live now" eyebrowVariant="outline" title="Trending live models" id="live-title">
+      <p class="text-fg-muted">
+        Real rooms, streaming this minute and ranked by who's drawing the biggest crowd. Updated every 60 seconds.
+      </p>
+    </SectionHeading>
+    <div class="mt-10">
+      <LiveCatalog client:visible pageSize={12} adEvery={0} />
+    </div>
+    <div class="mt-10 flex justify-center">
+      <Button href="/models" variant="gradient" size="lg">Browse the full catalog</Button>
+    </div>
+  </Section>
+
+  {/* Featured categories */}
+  <Section id="categories" labelledby="categories-title">
+    <SectionHeading eyebrow="Categories" eyebrowVariant="premium" title="Explore by category" id="categories-title">
+      <p class="text-fg-muted">Jump straight to the scene you're after — each list is live and self-updating.</p>
+    </SectionHeading>
+    <ul class="mt-10 grid grid-cols-2 gap-4 sm:grid-cols-3 lg:grid-cols-5" data-reveal-group data-reveal-step="60">
+      {FEATURED_CATEGORIES.map((c) => (
+        <li>
+          <a
+            href={`/models/${c.slug}`}
+            class="flex h-full flex-col justify-between gap-6 rounded-(--radius-lg) border border-border bg-surface p-5
+                   transition-[transform,border-color] duration-(--dur-mid) ease-(--ease-out-soft)
+                   hover:-translate-y-1 hover:border-premium-500 motion-reduce:transform-none"
+          >
+            <span class="text-lg text-fg">{c.label}</span>
+            <span class="text-sm text-premium-300">View live →</span>
+          </a>
+        </li>
+      ))}
+    </ul>
+  </Section>
+
+  {/* Closing CTA — affiliate home tour */}
+  <Section id="join" labelledby="join-title" class="bg-bg-elev">
+    <div class="mx-auto flex max-w-2xl flex-col items-center gap-6 text-center">
+      <h2 id="join-title" class="text-3xl text-fg sm:text-4xl">Thousands of models are live right now</h2>
+      <p class="text-fg-muted">Free to watch, no account required to start. Step inside and find your favorite.</p>
+      <Button href={buildAffiliateLink('home', 'home')} variant="primary" size="lg">Enter live cams</Button>
+    </div>
+  </Section>
 
   <SiteFooter slot="footer" />
 </BaseLayout>

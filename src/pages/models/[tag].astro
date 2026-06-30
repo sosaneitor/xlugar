@@ -1,0 +1,78 @@
+---
+import BaseLayout from '@layouts/BaseLayout.astro';
+import SiteHeader from '@components/SiteHeader.astro';
+import SiteFooter from '@components/SiteFooter.astro';
+import Section from '@components/ui/Section.astro';
+import LiveCatalog from '@features/catalog/components/LiveCatalog.tsx';
+import AdSlot from '@features/ads/components/AdSlot.astro';
+import { CATEGORIES, getCategoryBySlug } from '@features/catalog/data/categories';
+import { breadcrumbSchema } from '@lib/schema';
+
+export function getStaticPaths() {
+  return CATEGORIES.map((c) => ({ params: { tag: c.slug } }));
+}
+
+const { tag } = Astro.params;
+const category = getCategoryBySlug(tag!);
+if (!category) {
+  return Astro.redirect('/models', 302);
+}
+
+const breadcrumbs = breadcrumbSchema([
+  { name: 'Home', path: '/' },
+  { name: 'Models', path: '/models' },
+  { name: category.label, path: `/models/${category.slug}` },
+]);
+
+const related = CATEGORIES.filter((c) => c.slug !== category.slug);
+---
+<BaseLayout
+  title={category.title}
+  description={category.description}
+  canonical={`/models/${category.slug}`}
+  schemas={[breadcrumbs]}
+>
+  <SiteHeader slot="header" />
+
+  <Section labelledby="cat-title">
+    <header class="flex max-w-3xl flex-col gap-4" data-reveal>
+      <nav aria-label="Breadcrumb" class="text-sm text-fg-subtle">
+        <a href="/" class="hover:text-premium-300">Home</a> <span aria-hidden="true">/</span>
+        <a href="/models" class="hover:text-premium-300">Models</a> <span aria-hidden="true">/</span>
+        <span class="text-fg-muted">{category.label}</span>
+      </nav>
+      <h1 class="text-4xl text-fg sm:text-5xl">{category.h1}</h1>
+      <p class="text-fg-muted">{category.intro}</p>
+    </header>
+
+    <div class="mt-10 grid gap-8 lg:grid-cols-[1fr_300px]">
+      <div>
+        <LiveCatalog client:visible initialTag={category.tag} pageSize={24} adEvery={12} />
+      </div>
+      <aside class="hidden lg:block">
+        <div class="sticky top-24">
+          <AdSlot variant="sidebar" slotId={`category-${category.slug}-sidebar`} />
+        </div>
+      </aside>
+    </div>
+
+    <nav class="mt-14 border-t border-border pt-8" aria-label="Related categories">
+      <h2 class="text-sm uppercase tracking-[0.14em] text-fg-subtle">Related categories</h2>
+      <ul class="mt-4 flex flex-wrap gap-3">
+        {related.map((c) => (
+          <li>
+            <a
+              href={`/models/${c.slug}`}
+              class="rounded-(--radius-pill) border border-border-strong bg-surface px-4 py-2 text-sm text-fg-muted
+                     transition-colors duration-(--dur-fast) hover:border-premium-500 hover:text-premium-300"
+            >
+              {c.label}
+            </a>
+          </li>
+        ))}
+      </ul>
+    </nav>
+  </Section>
+
+  <SiteFooter slot="footer" />
+</BaseLayout>

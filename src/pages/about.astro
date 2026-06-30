@@ -1,0 +1,57 @@
+---
+import BaseLayout from '@layouts/BaseLayout.astro';
+import SiteHeader from '@components/SiteHeader.astro';
+import SiteFooter from '@components/SiteFooter.astro';
+import Section from '@components/ui/Section.astro';
+import { SITE } from '@lib/site';
+---
+<BaseLayout
+  title="About xLugar"
+  description="What xLugar is, how the live catalog works, and our 18+ adults-only policy. Independent discovery for live cam models."
+  canonical="/about"
+>
+  <SiteHeader slot="header" />
+
+  <Section labelledby="about-title">
+    <article class="mx-auto max-w-2xl">
+      <h1 class="text-4xl text-fg sm:text-5xl" data-reveal>About {SITE.name}</h1>
+
+      <div class="mt-8 flex flex-col gap-5 text-fg-muted" data-reveal style="--reveal-delay: 80ms">
+        <p>
+          {SITE.name} is an independent discovery layer for live cam models. We don't host streams or store
+          video — we surface who is broadcasting publicly right now and rank rooms by live audience so you can
+          find a great room in seconds. Every preview you see is a periodically-refreshed snapshot, not a
+          recording.
+        </p>
+        <p>
+          When you open a room, you're taken directly to the performer's live cam to watch and chat. Browsing
+          and watching are free, and you only need an account if you want to interact, tip, or follow your
+          favorites.
+        </p>
+
+        <h2 class="mt-6 text-2xl text-fg">Adults only — 18+</h2>
+        <p>
+          {SITE.name} contains adult content and is strictly for adults aged 18 or older (21 where required by
+          local law). All performers are verified adults. If you are a minor, or if adult content is illegal
+          where you live, please leave now.
+        </p>
+
+        <h2 class="mt-6 text-2xl text-fg">How rooms stay current</h2>
+        <p>
+          The catalog reads a live feed of public rooms and reorders it around current viewer counts. Snapshots
+          and rankings refresh roughly every minute, so the lineup you see reflects who is actually online at
+          that moment. Models come and go throughout the day, so the grid is never the same twice.
+        </p>
+
+        <h2 class="mt-6 text-2xl text-fg">Affiliate disclosure</h2>
+        <p>
+          {SITE.name} participates in the Chaturbate affiliate program. When you visit a room or sign up through
+          a link on this site, we may earn a commission at no extra cost to you. This never affects which rooms
+          appear or how they're ranked — ordering is driven purely by live viewer counts.
+        </p>
+      </div>
+    </article>
+  </Section>
+
+  <SiteFooter slot="footer" />
+</BaseLayout>

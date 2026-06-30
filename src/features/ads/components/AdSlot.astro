@@ -1,0 +1,36 @@
+---
+/**
+ * Intentionally-empty ad placeholder — the ONLY allowed placeholder in the
+ * project. Real creatives are injected later via GTM or a direct ad tag.
+ * Reserves layout space (explicit min-heights) to avoid CLS when filled.
+ *
+ * Variants:
+ *  - sidebar:  300x600-ish rail unit (catalog sidebar)
+ *  - in-grid:  responsive banner dropped between catalog cards
+ *  - banner:   leaderboard at the top of blog articles
+ */
+interface Props {
+  variant?: 'sidebar' | 'in-grid' | 'banner';
+  /** GTM/ad-manager slot identifier, surfaced as a data attribute hook. */
+  slotId?: string;
+  class?: string;
+}
+const { variant = 'in-grid', slotId, class: className = '' } = Astro.props;
+
+const sizes = {
+  sidebar: 'min-h-[600px] w-full',
+  'in-grid': 'min-h-[120px] w-full',
+  banner: 'min-h-[90px] w-full',
+};
+---
+<aside
+  class:list={[
+    'flex items-center justify-center rounded-(--radius-md) border border-dashed border-border-strong bg-surface text-fg-subtle',
+    sizes[variant],
+    className,
+  ]}
+  data-ad-slot={slotId ?? variant}
+  aria-hidden="true"
+>
+  <span class="text-[0.6875rem] uppercase tracking-[0.18em]">Advertisement</span>
+</aside>

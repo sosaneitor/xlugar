@@ -1,0 +1,85 @@
+---
+import BaseLayout from './BaseLayout.astro';
+import SiteHeader from '@components/SiteHeader.astro';
+import SiteFooter from '@components/SiteFooter.astro';
+import Section from '@components/ui/Section.astro';
+import AdSlot from '@features/ads/components/AdSlot.astro';
+import { articleSchema, breadcrumbSchema } from '@lib/schema';
+import type { CollectionEntry } from 'astro:content';
+
+interface Props {
+  entry: CollectionEntry<'blog'>;
+}
+const { entry } = Astro.props;
+const { data } = entry;
+const path = `/blog/${entry.slug}`;
+
+const schemas = [
+  breadcrumbSchema([
+    { name: 'Home', path: '/' },
+    { name: 'Blog', path: '/blog' },
+    { name: data.title, path },
+  ]),
+  articleSchema({
+    title: data.title,
+    description: data.description,
+    path,
+    datePublished: data.pubDate.toISOString(),
+    dateModified: data.updatedDate?.toISOString(),
+    image: data.heroImage,
+  }),
+];
+
+const dateFmt = new Intl.DateTimeFormat('en-US', {
+  year: 'numeric',
+  month: 'long',
+  day: 'numeric',
+});
+---
+<BaseLayout
+  title={data.title}
+  description={data.description}
+  canonical={path}
+  image={data.heroImage}
+  type="article"
+  schemas={schemas}
+>
+  <SiteHeader slot="header" />
+
+  <Section labelledby="post-title">
+    <div class="mx-auto max-w-3xl">
+      <AdSlot variant="banner" slotId="blog-top" class="mb-10" />
+
+      <nav aria-label="Breadcrumb" class="text-sm text-fg-subtle">
+        <a href="/" class="hover:text-premium-300">Home</a> <span aria-hidden="true">/</span>
+        <a href="/blog" class="hover:text-premium-300">Blog</a> <span aria-hidden="true">/</span>
+        <span class="text-fg-muted">{data.title}</span>
+      </nav>
+
+      <header class="mt-4 flex flex-col gap-3">
+        <h1 class="text-4xl text-fg sm:text-5xl">{data.title}</h1>
+        <p class="text-fg-muted">{data.description}</p>
+        <time datetime={data.pubDate.toISOString()} class="text-sm text-fg-subtle">
+          {dateFmt.format(data.pubDate)}
+        </time>
+      </header>
+
+      <div class="post-body mt-10 flex flex-col gap-5 text-fg-muted">
+        <slot />
+      </div>
+    </div>
+  </Section>
+
+  <SiteFooter slot="footer" />
+</BaseLayout>
+
+<style is:global>
+  /* Article prose rhythm using design tokens only. */
+  .post-body h2 { color: var(--c-fg); font-size: 1.75rem; margin-top: 1.5rem; }
+  .post-body h3 { color: var(--c-fg); font-size: 1.35rem; margin-top: 1rem; }
+  .post-body a { color: var(--c-primary-300); text-decoration: underline; }
+  .post-body a:hover { color: var(--c-premium-300); }
+  .post-body ul { padding-left: 1.25rem; list-style: disc; }
+  .post-body li { margin-top: 0.35rem; }
+  .post-body strong { color: var(--c-fg); }
+</style>
