@@ -1,0 +1,29 @@
+---
+import Section from '@components/ui/Section.astro';
+import SectionHeading from '@components/ui/SectionHeading.astro';
+import SwipeDeck from './components/SwipeDeck.tsx';
+import type { Model } from '@data/model.schema';
+
+interface Props { models: Model[] }
+const { models } = Astro.props;
+---
+<Section id="descubre" labelledby="descubre-title" class="bg-bg">
+  <div class="grid items-center gap-10 lg:grid-cols-2 lg:gap-16">
+    <SectionHeading
+      eyebrow="Descubrimiento"
+      eyebrowVariant="crimson"
+      title="Desliza para descubrir"
+      id="descubre-title"
+    >
+      <p class="text-fg-muted">
+        Arrastra la tarjeta a la derecha si te gusta, a la izquierda para pasar.
+        Física real, inercia y rotación — como debe sentirse.
+      </p>
+    </SectionHeading>
+
+    <div data-reveal style="--reveal-delay: 80ms">
+      {/* Interactive island: hydrate only when scrolled into view */}
+      <SwipeDeck models={models} client:visible />
+    </div>
+  </div>
+</Section>
