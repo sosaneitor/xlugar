@@ -1,0 +1,79 @@
+---
+/**
+ * Global, JS-light motion driver:
+ *  - Scroll-reveal via IntersectionObserver (toggles .is-visible, no per-frame JS).
+ *  - Optional stagger: a [data-reveal-group] sets incremental --reveal-delay on children.
+ *  - Subtle parallax for [data-parallax] (rAF-throttled, transform only).
+ * Re-initializes after Astro View Transitions (astro:page-load).
+ * Fully disabled under prefers-reduced-motion.
+ */
+---
+<script>
+  function initReveal() {
+    const reduce = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+    if (reduce) {
+      document.querySelectorAll('[data-reveal]').forEach((el) => el.classList.add('is-visible'));
+      return;
+    }
+
+    // Stagger: assign delays to children of reveal groups before observing.
+    document.querySelectorAll<HTMLElement>('[data-reveal-group]').forEach((group) => {
+      const step = Number(group.dataset.revealStep ?? 80);
+      group.querySelectorAll<HTMLElement>('[data-reveal]').forEach((child, i) => {
+        if (!child.style.getPropertyValue('--reveal-delay')) {
+          child.style.setProperty('--reveal-delay', `${i * step}ms`);
+        }
+      });
+    });
+
+    const io = new IntersectionObserver(
+      (entries, obs) => {
+        for (const entry of entries) {
+          if (!entry.isIntersecting) continue;
+          const el = entry.target as HTMLElement;
+          el.classList.add('is-visible');
+          const onEnd = () => el.classList.add('is-settled');
+          el.addEventListener('transitionend', onEnd, { once: true });
+          obs.unobserve(el);
+        }
+      },
+      { rootMargin: '0px 0px -10% 0px', threshold: 0.1 }
+    );
+    document.querySelectorAll('[data-reveal]:not(.is-visible)').forEach((el) => io.observe(el));
+  }
+
+  function initParallax() {
+    const reduce = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+    const nodes = Array.from(document.querySelectorAll<HTMLElement>('[data-parallax]'));
+    if (reduce || nodes.length === 0) return;
+
+    let ticking = false;
+    const update = () => {
+      const vh = window.innerHeight;
+      for (const el of nodes) {
+        const speed = Number(el.dataset.parallax ?? 0.15);
+        const rect = el.getBoundingClientRect();
+        const offset = (rect.top + rect.height / 2 - vh / 2) * -speed;
+        el.style.transform = `translate3d(0, ${offset.toFixed(1)}px, 0)`;
+      }
+      ticking = false;
+    };
+    const onScroll = () => {
+      if (!ticking) {
+        ticking = true;
+        requestAnimationFrame(update);
+      }
+    };
+    window.addEventListener('scroll', onScroll, { passive: true });
+    window.addEventListener('resize', onScroll, { passive: true });
+    update();
+  }
+
+  function init() {
+    initReveal();
+    initParallax();
+  }
+
+  // Initial load + after each client-side View Transition navigation.
+  document.addEventListener('astro:page-load', init);
+</script>

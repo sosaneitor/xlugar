@@ -1,0 +1,54 @@
+---
+import { SITE, absoluteUrl } from '@lib/site';
+
+interface Props {
+  title: string;
+  description?: string;
+  /** Path or absolute URL for the canonical. Defaults to the current page. */
+  canonical?: string;
+  /** OG/Twitter image (path or absolute). */
+  image?: string;
+  /** og:type — "website" for pages, "profile" for model profiles. */
+  type?: 'website' | 'profile' | 'article';
+  /** Suppress " — xLugar" suffix (e.g. for the home page that already brands the title). */
+  rawTitle?: boolean;
+  noindex?: boolean;
+}
+
+const {
+  title,
+  description = SITE.defaultDescription,
+  canonical,
+  image = SITE.defaultOgImage,
+  type = 'website',
+  rawTitle = false,
+  noindex = false,
+} = Astro.props;
+
+const canonicalUrl = canonical
+  ? absoluteUrl(canonical)
+  : new URL(Astro.url.pathname, SITE.url).href;
+const fullTitle = rawTitle ? title : `${title} — ${SITE.name}`;
+const imageUrl = absoluteUrl(image);
+---
+
+<title>{fullTitle}</title>
+<meta name="description" content={description} />
+<link rel="canonical" href={canonicalUrl} />
+{noindex && <meta name="robots" content="noindex, nofollow" />}
+
+{/* Open Graph */}
+<meta property="og:type" content={type} />
+<meta property="og:site_name" content={SITE.name} />
+<meta property="og:locale" content={SITE.locale} />
+<meta property="og:title" content={fullTitle} />
+<meta property="og:description" content={description} />
+<meta property="og:url" content={canonicalUrl} />
+<meta property="og:image" content={imageUrl} />
+
+{/* Twitter */}
+<meta name="twitter:card" content="summary_large_image" />
+<meta name="twitter:site" content={SITE.twitter} />
+<meta name="twitter:title" content={fullTitle} />
+<meta name="twitter:description" content={description} />
+<meta name="twitter:image" content={imageUrl} />

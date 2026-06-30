@@ -1,0 +1,77 @@
+---
+import { ClientRouter } from 'astro:transitions';
+import { SITE } from '@lib/site';
+import { websiteSchema } from '@lib/schema';
+import Seo from '@components/seo/Seo.astro';
+import JsonLd from '@components/seo/JsonLd.astro';
+import Motion from '@components/Motion.astro';
+import '@styles/global.css';
+
+interface Props {
+  title: string;
+  description?: string;
+  canonical?: string;
+  image?: string;
+  type?: 'website' | 'profile' | 'article';
+  rawTitle?: boolean;
+  noindex?: boolean;
+  /** Extra JSON-LD graphs for this page (breadcrumbs, profile, etc.). */
+  schemas?: (Record<string, unknown> | Record<string, unknown>[])[];
+}
+
+const {
+  title,
+  description,
+  canonical,
+  image,
+  type,
+  rawTitle,
+  noindex,
+  schemas = [],
+} = Astro.props;
+---
+<!doctype html>
+<html lang={SITE.lang}>
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="theme-color" content="#0b0809" />
+    <meta name="generator" content={Astro.generator} />
+    <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
+
+    {/* LCP-critical font preloaded; both are self-hosted with font-display: swap. */}
+    <link
+      rel="preload"
+      href="/fonts/fraunces-var.woff2"
+      as="font"
+      type="font/woff2"
+      crossorigin
+    />
+
+    <Seo
+      title={title}
+      description={description}
+      canonical={canonical}
+      image={image}
+      type={type}
+      rawTitle={rawTitle}
+      noindex={noindex}
+    />
+
+    {/* Site-wide structured data */}
+    <JsonLd schema={websiteSchema()} />
+    {schemas.map((s) => <JsonLd schema={s} />)}
+
+    {/* Smooth client-side navigation + shared-element transitions */}
+    <ClientRouter />
+  </head>
+  <body>
+    <a href="#main" class="sr-only focus:not-sr-only">Saltar al contenido</a>
+    <slot name="header" />
+    <main id="main">
+      <slot />
+    </main>
+    <slot name="footer" />
+    <Motion />
+  </body>
+</html>
