@@ -13,8 +13,8 @@ const { cover } = model;
 ---
 <a
   href={`/modelos/${model.slug}`}
-  class="group relative block overflow-hidden rounded-[--radius-lg] bg-surface border border-border
-         transition-[transform,box-shadow] duration-[--dur-mid] ease-[--ease-out-soft]
+  class="group relative block overflow-hidden rounded-(--radius-lg) bg-surface border border-border
+         transition-[transform,box-shadow] duration-(--dur-mid) ease-(--ease-out-soft)
          hover:-translate-y-1 hover:shadow-[var(--shadow-card)] focus-visible:-translate-y-1
          motion-reduce:transform-none"
   data-reveal
@@ -31,7 +31,7 @@ const { cover } = model;
       fetchpriority={priority ? 'high' : 'auto'}
       decoding="async"
       format="avif"
-      class="h-full w-full object-cover transition-transform duration-[--dur-slow] ease-[--ease-out-soft]
+      class="h-full w-full object-cover transition-transform duration-(--dur-slow) ease-(--ease-out-soft)
              group-hover:scale-[1.05] motion-reduce:transform-none"
     />
     {/* solid gradient veil for legibility — opaque color stops, no blur/glass */}

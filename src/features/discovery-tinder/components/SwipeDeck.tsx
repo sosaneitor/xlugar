@@ -139,7 +139,7 @@ function Card({
       exit={{ x: exitX, opacity: 0, transition: { duration: 0.32 } }}
       transition={{ type: 'spring', stiffness: 300, damping: 30 }}
     >
-      <article className="relative h-full w-full overflow-hidden rounded-[--radius-xl] border border-border bg-surface shadow-[var(--shadow-card)]">
+      <article className="relative h-full w-full overflow-hidden rounded-(--radius-xl) border border-border bg-surface shadow-[var(--shadow-card)]">
         <img
           src={model.cover.src}
           alt={model.cover.alt}
@@ -227,7 +227,7 @@ function ActionButton({
 
 function EmptyState({ likedCount, onReset }: { likedCount: number; onReset: () => void }) {
   return (
-    <div className="grid h-full w-full place-items-center rounded-[--radius-xl] border border-dashed border-border-strong bg-surface p-8 text-center">
+    <div className="grid h-full w-full place-items-center rounded-(--radius-xl) border border-dashed border-border-strong bg-surface p-8 text-center">
       <div>
         <p className="font-display text-2xl text-fg">Has visto todas</p>
         <p className="mt-2 text-sm text-fg-muted">
@@ -238,7 +238,7 @@ function EmptyState({ likedCount, onReset }: { likedCount: number; onReset: () =
         <button
           type="button"
           onClick={onReset}
-          className="mt-5 rounded-[--radius-md] bg-primary-500 px-5 py-2.5 text-sm font-medium text-on-primary transition-transform hover:-translate-y-0.5 motion-reduce:transform-none"
+          className="mt-5 rounded-(--radius-md) bg-primary-500 px-5 py-2.5 text-sm font-medium text-on-primary transition-transform hover:-translate-y-0.5 motion-reduce:transform-none"
         >
           Reiniciar
         </button>

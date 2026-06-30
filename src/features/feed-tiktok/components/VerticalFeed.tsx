@@ -22,7 +22,7 @@ export default function VerticalFeed({ models }: Props) {
   return (
     <div
       className="relative mx-auto h-[78vh] max-h-[760px] w-full max-w-[380px] overflow-y-auto
-                 snap-y snap-mandatory rounded-[--radius-xl] border border-border bg-black
+                 snap-y snap-mandatory rounded-(--radius-xl) border border-border bg-black
                  [scrollbar-width:none] [&::-webkit-scrollbar]:hidden"
       aria-label="Feed vertical de modelos"
     >

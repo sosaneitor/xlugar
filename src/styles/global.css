@@ -47,11 +47,8 @@
   --color-like: var(--c-like);
   --color-nope: var(--c-nope);
 
-  --radius-sm: var(--radius-sm);
-  --radius-md: var(--radius-md);
-  --radius-lg: var(--radius-lg);
-  --radius-xl: var(--radius-xl);
-  --radius-2xl: var(--radius-2xl);
+  /* Radii are consumed via the rounded-(--radius-*) shorthand referencing
+     the :root tokens in tokens.css, so they are not redeclared here. */
 
   --font-display: var(--font-display);
   --font-sans: var(--font-sans);

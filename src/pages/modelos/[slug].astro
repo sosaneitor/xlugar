@@ -54,7 +54,7 @@ const schemas = [
       </nav>
 
       <div class="grid gap-10 lg:grid-cols-[minmax(0,420px)_1fr] lg:gap-14">
-        <div class="overflow-hidden rounded-[--radius-xl] border border-border" transition:name={`cover-${model.slug}`}>
+        <div class="overflow-hidden rounded-(--radius-xl) border border-border" transition:name={`cover-${model.slug}`}>
           <Image
             src={model.cover.src}
             alt={model.cover.alt}
@@ -94,7 +94,7 @@ const schemas = [
       <h2 id="galeria-title" class="sr-only">Galería de {model.name}</h2>
       <ul class="grid grid-cols-2 gap-4 sm:grid-cols-3" data-reveal-group data-reveal-step="80">
         {model.gallery.map((media) => (
-          <li class="overflow-hidden rounded-[--radius-lg] border border-border" data-reveal>
+          <li class="overflow-hidden rounded-(--radius-lg) border border-border" data-reveal>
             <Image
               src={media.src}
               alt={media.alt}
@@ -105,7 +105,7 @@ const schemas = [
               loading="lazy"
               decoding="async"
               format="avif"
-              class="aspect-[3/4] h-full w-full object-cover transition-transform duration-[--dur-slow] hover:scale-105 motion-reduce:transform-none"
+              class="aspect-[3/4] h-full w-full object-cover transition-transform duration-(--dur-slow) hover:scale-105 motion-reduce:transform-none"
             />
           </li>
         ))}

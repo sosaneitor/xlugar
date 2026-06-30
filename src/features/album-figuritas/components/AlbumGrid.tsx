@@ -75,14 +75,14 @@ export default function AlbumGrid({ models }: Props) {
           <button
             type="button"
             onClick={collectAll}
-            className="rounded-[--radius-md] bg-primary-500 px-4 py-2 text-sm font-medium text-on-primary transition-transform hover:-translate-y-0.5 motion-reduce:transform-none"
+            className="rounded-(--radius-md) bg-primary-500 px-4 py-2 text-sm font-medium text-on-primary transition-transform hover:-translate-y-0.5 motion-reduce:transform-none"
           >
             Completar álbum
           </button>
           <button
             type="button"
             onClick={resetAlbum}
-            className="rounded-[--radius-md] border border-border-strong bg-surface px-4 py-2 text-sm text-fg-muted transition-colors hover:text-fg"
+            className="rounded-(--radius-md) border border-border-strong bg-surface px-4 py-2 text-sm text-fg-muted transition-colors hover:text-fg"
           >
             Reiniciar
           </button>
@@ -125,7 +125,7 @@ function Sticker({
         type="button"
         onClick={onCollect}
         aria-label={`Desbloquear figurita de ${model.name}`}
-        className={`relative grid aspect-[3/4] w-full place-items-center overflow-hidden rounded-[--radius-lg]
+        className={`relative grid aspect-[3/4] w-full place-items-center overflow-hidden rounded-(--radius-lg)
           border-2 border-dashed ${rarityRing[model.rarity]} bg-surface text-center
           transition-[transform,border-color] duration-200 hover:-translate-y-1 hover:border-premium-400
           focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-premium-400 motion-reduce:transform-none`}
@@ -152,7 +152,7 @@ function Sticker({
         initial={{ scale: 0.6, opacity: 0, rotate: -6 }}
         animate={{ scale: 1, opacity: 1, rotate: 0 }}
         transition={{ type: 'spring', stiffness: 320, damping: 18 }}
-        className="relative block aspect-[3/4] w-full rounded-[--radius-lg] [transform-style:preserve-3d]
+        className="relative block aspect-[3/4] w-full rounded-(--radius-lg) [transform-style:preserve-3d]
           focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-premium-400"
       >
         <motion.div
@@ -162,7 +162,7 @@ function Sticker({
         >
           {/* FRONT */}
           <div
-            className={`absolute inset-0 overflow-hidden rounded-[--radius-lg] border-2 ${rarityRing[model.rarity]}
+            className={`absolute inset-0 overflow-hidden rounded-(--radius-lg) border-2 ${rarityRing[model.rarity]}
               bg-surface [backface-visibility:hidden] ${model.premium ? 'foil' : ''}`}
           >
             <img
@@ -194,7 +194,7 @@ function Sticker({
 
           {/* BACK */}
           <div
-            className="absolute inset-0 flex flex-col justify-between overflow-hidden rounded-[--radius-lg]
+            className="absolute inset-0 flex flex-col justify-between overflow-hidden rounded-(--radius-lg)
               border-2 border-border-strong bg-bg-elev p-4 text-left [backface-visibility:hidden]
               [transform:rotateY(180deg)]"
           >
@@ -209,7 +209,7 @@ function Sticker({
             <a
               href={`/modelos/${model.slug}`}
               onClick={(e) => e.stopPropagation()}
-              className="mt-2 inline-block rounded-[--radius-sm] bg-primary-500 px-3 py-1.5 text-center text-xs font-medium text-on-primary"
+              className="mt-2 inline-block rounded-(--radius-sm) bg-primary-500 px-3 py-1.5 text-center text-xs font-medium text-on-primary"
             >
               Ver perfil
             </a>

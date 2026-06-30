@@ -15,14 +15,14 @@ const links = [
     <ul class="hidden items-center gap-7 text-sm text-fg-muted md:flex">
       {links.map((l) => (
         <li>
-          <a href={l.href} class="transition-colors duration-[--dur-fast] hover:text-premium-300">{l.label}</a>
+          <a href={l.href} class="transition-colors duration-(--dur-fast) hover:text-premium-300">{l.label}</a>
         </li>
       ))}
     </ul>
     <a
       href="/#descubre"
-      class="rounded-[--radius-md] bg-primary-500 px-4 py-2 text-sm font-medium text-on-primary
-             transition-[transform,background-color] duration-[--dur-fast] hover:-translate-y-0.5
+      class="rounded-(--radius-md) bg-primary-500 px-4 py-2 text-sm font-medium text-on-primary
+             transition-[transform,background-color] duration-(--dur-fast) hover:-translate-y-0.5
              hover:bg-primary-600 motion-reduce:transform-none"
     >
       Entrar
