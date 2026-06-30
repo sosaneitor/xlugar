@@ -1,0 +1,18 @@
+---
+import BaseLayout from '@layouts/BaseLayout.astro';
+import SiteHeader from '@components/SiteHeader.astro';
+import SiteFooter from '@components/SiteFooter.astro';
+import Button from '@components/ui/Button.astro';
+---
+<BaseLayout title="Página no encontrada" noindex>
+  <SiteHeader slot="header" />
+  <section class="mx-auto flex min-h-[60vh] max-w-2xl flex-col items-center justify-center px-5 text-center">
+    <p class="font-display text-7xl text-crimson-500">404</p>
+    <h1 class="mt-4 text-3xl text-fg">Aquí no hay nada que descubrir</h1>
+    <p class="mt-3 text-fg-muted">La página que buscas no existe o se ha movido.</p>
+    <div class="mt-8">
+      <Button href="/" variant="crimson" size="lg">Volver al inicio</Button>
+    </div>
+  </section>
+  <SiteFooter slot="footer" />
+</BaseLayout>
