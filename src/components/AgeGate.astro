@@ -1,0 +1,163 @@
+---
+/**
+ * AgeGate — simple 18+ confirmation modal (Chaturbate-style).
+ *
+ * Behavior:
+ *  - Renders on every page (any page can be an entry point via SEO/deep link).
+ *  - The head script in BaseLayout adds `age-ok` to <html> BEFORE paint when the
+ *    visitor has already confirmed, so there is no flash of the gate on repeat
+ *    visits and no flash of content on first visits.
+ *  - "I am 18+" persists consent in localStorage (365 days) and reveals the site.
+ *  - "I am under 18" sends the visitor away to a neutral, safe destination.
+ *
+ * Note: page content is still present in the DOM behind the overlay, so search
+ * engines index the site normally — the gate is a visual/interaction block, the
+ * same approach Chaturbate and other adult sites use.
+ */
+import { SITE } from '@lib/site';
+---
+<div
+  id="age-gate"
+  role="dialog"
+  aria-modal="true"
+  aria-labelledby="age-gate-title"
+  aria-describedby="age-gate-desc"
+>
+  <div class="age-gate__card">
+    <p class="age-gate__brand">x<span>Lugar</span></p>
+    <h2 id="age-gate-title" class="age-gate__title">Adults only — 18+</h2>
+    <p id="age-gate-desc" class="age-gate__desc">
+      This website contains adult-oriented material and links to adult content operated by third parties.
+      By entering you confirm that you are at least 18 years old (21 where required), that viewing adult
+      material is legal in your location, and that you agree to our
+      <a href="/terms">Terms</a> and <a href="/privacy">Privacy Policy</a>.
+    </p>
+    <div class="age-gate__actions">
+      <button type="button" id="age-gate-enter" class="age-gate__btn age-gate__btn--yes">
+        I am 18 or older — Enter
+      </button>
+      <button type="button" id="age-gate-leave" class="age-gate__btn age-gate__btn--no">
+        I am under 18 — Leave
+      </button>
+    </div>
+    <p class="age-gate__legal">
+      {SITE.name} does not produce or host any content. All performers are verified adults.
+      See our <a href="/2257">2257 statement</a>.
+    </p>
+  </div>
+</div>
+
+<style>
+  #age-gate {
+    position: fixed;
+    inset: 0;
+    z-index: 100;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 1.25rem;
+    background: var(--color-bg);
+    overflow-y: auto;
+  }
+  /* Hidden once the visitor has confirmed (class set on <html> before paint). */
+  :global(html.age-ok) #age-gate { display: none; }
+
+  .age-gate__card {
+    width: 100%;
+    max-width: 30rem;
+    border: 1px solid var(--color-border);
+    background: var(--color-bg-elev);
+    border-radius: 1rem;
+    padding: 2rem 1.75rem;
+    text-align: center;
+  }
+  .age-gate__brand {
+    font-family: var(--font-display, inherit);
+    font-size: 1.5rem;
+    color: var(--color-fg);
+    margin-bottom: 0.75rem;
+  }
+  .age-gate__brand span { color: var(--color-primary-500); }
+  .age-gate__title {
+    font-size: 1.5rem;
+    color: var(--color-fg);
+    margin-bottom: 0.75rem;
+  }
+  .age-gate__desc {
+    font-size: 0.9rem;
+    line-height: 1.6;
+    color: var(--color-fg-muted);
+  }
+  .age-gate__desc a { color: var(--color-primary-300); text-decoration: underline; }
+  .age-gate__actions {
+    display: flex;
+    flex-direction: column;
+    gap: 0.75rem;
+    margin: 1.5rem 0 1rem;
+  }
+  .age-gate__btn {
+    width: 100%;
+    padding: 0.85rem 1rem;
+    border-radius: 0.6rem;
+    font-size: 0.95rem;
+    font-weight: 600;
+    cursor: pointer;
+    border: 1px solid transparent;
+  }
+  .age-gate__btn--yes {
+    background: var(--color-primary-500);
+    color: var(--color-on-primary);
+  }
+  .age-gate__btn--yes:hover { background: var(--color-primary-600); }
+  .age-gate__btn--no {
+    background: transparent;
+    border-color: var(--color-border);
+    color: var(--color-fg-muted);
+  }
+  .age-gate__btn--no:hover { color: var(--color-fg); }
+  .age-gate__legal {
+    font-size: 0.7rem;
+    line-height: 1.5;
+    color: var(--color-fg-subtle);
+  }
+  .age-gate__legal a { color: var(--color-fg-muted); text-decoration: underline; }
+</style>
+
+<script is:inline>
+  (function () {
+    var KEY = 'xlugar_age_ok';
+    var LEAVE_URL = 'https://www.google.com';
+
+    function reveal() {
+      try {
+        var payload = JSON.stringify({ v: 1, t: Date.now() });
+        localStorage.setItem(KEY, payload);
+      } catch (e) {}
+      document.documentElement.classList.add('age-ok');
+      document.body.style.removeProperty('overflow');
+    }
+
+    function wire() {
+      var gate = document.getElementById('age-gate');
+      if (!gate) return;
+      // Lock scroll while the gate is visible.
+      if (!document.documentElement.classList.contains('age-ok')) {
+        document.body.style.overflow = 'hidden';
+      }
+      var enter = document.getElementById('age-gate-enter');
+      var leave = document.getElementById('age-gate-leave');
+      if (enter) enter.addEventListener('click', reveal);
+      if (leave) leave.addEventListener('click', function () {
+        window.location.href = LEAVE_URL;
+      });
+    }
+
+    if (document.readyState === 'loading') {
+      document.addEventListener('DOMContentLoaded', wire);
+    } else {
+      wire();
+    }
+    // Re-wire after client-side (View Transitions) navigations.
+    document.addEventListener('astro:page-load', wire);
+  })();
+</script>

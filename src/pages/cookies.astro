@@ -1,0 +1,73 @@
+---
+import BaseLayout from '@layouts/BaseLayout.astro';
+import SiteHeader from '@components/SiteHeader.astro';
+import SiteFooter from '@components/SiteFooter.astro';
+import Section from '@components/ui/Section.astro';
+import { SITE } from '@lib/site';
+
+const updated = 'June 30, 2026';
+---
+<BaseLayout
+  title="Cookie Policy"
+  description="How xLugar uses cookies and similar technologies, and how to control them. 18+ only."
+  canonical="/cookies"
+>
+  <SiteHeader slot="header" />
+
+  <Section labelledby="cookies-title">
+    <article class="mx-auto max-w-2xl">
+      <nav aria-label="Breadcrumb" class="text-sm text-fg-subtle" data-reveal>
+        <a href="/" class="hover:text-premium-300">Home</a> <span aria-hidden="true">/</span>
+        <span class="text-fg-muted">Cookies</span>
+      </nav>
+      <h1 class="mt-4 text-4xl text-fg sm:text-5xl" data-reveal>Cookie Policy</h1>
+      <p class="mt-2 text-sm text-fg-subtle" data-reveal>Last updated: {updated}</p>
+
+      <div class="mt-8 flex flex-col gap-5 text-fg-muted" data-reveal style="--reveal-delay: 80ms">
+        <p>
+          This policy explains how {SITE.name} uses cookies and similar technologies (such as
+          <code>localStorage</code>) and how you can control them.
+        </p>
+
+        <h2 class="mt-6 text-2xl text-fg">What we use</h2>
+        <ul class="flex list-disc flex-col gap-2 pl-6">
+          <li>
+            <strong>Strictly necessary — age confirmation.</strong> When you confirm you are 18 or older,
+            we store that choice locally in your browser so we don't ask you again. This is required for the
+            site to function and cannot be switched off.
+          </li>
+          <li>
+            <strong>Analytics (optional).</strong> We may use Google Analytics / Google Tag Manager to measure
+            aggregate traffic. These may set cookies or similar identifiers. They are not used to identify you
+            personally.
+          </li>
+          <li>
+            <strong>Affiliate attribution.</strong> When you click through to Chaturbate (or a co-branded
+            Chaturbate property), non-personal campaign parameters may be passed so referrals are attributed.
+          </li>
+        </ul>
+
+        <h2 class="mt-6 text-2xl text-fg">Managing cookies</h2>
+        <p>
+          You can block or delete cookies at any time through your browser settings, and you can opt out of
+          Google Analytics using the
+          <a href="https://tools.google.com/dlpage/gaoptout" class="text-primary-300 underline hover:text-premium-300" rel="nofollow noopener" target="_blank">Google Analytics Opt-out Add-on</a>.
+          Blocking analytics cookies does not affect your ability to browse the site.
+        </p>
+
+        <h2 class="mt-6 text-2xl text-fg">Third parties</h2>
+        <p>
+          Destinations you visit from this site (Chaturbate and co-branded properties) set their own cookies
+          under their own policies. Please review those policies on the destination site.
+        </p>
+
+        <h2 class="mt-6 text-2xl text-fg">Contact</h2>
+        <p>
+          Questions? Email <a href="mailto:privacy@xlugar.com" class="text-primary-300 underline hover:text-premium-300">privacy@xlugar.com</a>.
+        </p>
+      </div>
+    </article>
+  </Section>
+
+  <SiteFooter slot="footer" />
+</BaseLayout>

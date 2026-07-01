@@ -5,9 +5,12 @@ import { websiteSchema } from '@lib/schema';
 import Seo from '@components/seo/Seo.astro';
 import JsonLd from '@components/seo/JsonLd.astro';
 import Motion from '@components/Motion.astro';
+import AgeGate from '@components/AgeGate.astro';
+import CookieConsent from '@components/CookieConsent.astro';
 import '@styles/global.css';
 
 // Analytics / tag manager IDs — both optional; markup is a no-op when unset.
+// These are handed to CookieConsent, which loads them ONLY after consent.
 const GA_ID = import.meta.env.PUBLIC_GA_MEASUREMENT_ID?.trim();
 const GTM_ID = import.meta.env.PUBLIC_GTM_ID?.trim();
 
@@ -43,6 +46,16 @@ const {
     <meta name="generator" content={Astro.generator} />
     <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
 
+    {/* Age gate: mark <html> as confirmed BEFORE paint so there is no flash of
+        the gate (repeat visitors) nor of the content (first-time visitors). */}
+    <script is:inline>
+      try {
+        if (localStorage.getItem('xlugar_age_ok')) {
+          document.documentElement.classList.add('age-ok');
+        }
+      } catch (e) {}
+    </script>
+
     {/* LCP-critical display font preloaded; both are self-hosted with font-display: swap. */}
     <link
       rel="preload"
@@ -66,32 +79,20 @@ const {
     <JsonLd schema={websiteSchema()} />
     {schemas.map((s) => <JsonLd schema={s} />)}
 
-    {/* Google Tag Manager (placeholder container — fill in GTM) */}
-    {GTM_ID && (
-      <script is:inline set:html={`(function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start':new Date().getTime(),event:'gtm.js'});var f=d.getElementsByTagName(s)[0],j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src='https://www.googletagmanager.com/gtm.js?id='+i+dl;f.parentNode.insertBefore(j,f);})(window,document,'script','dataLayer','${GTM_ID}');`} />
-    )}
-
-    {/* Google Analytics 4 */}
-    {GA_ID && (
-      <>
-        <script is:inline async src={`https://www.googletagmanager.com/gtag/js?id=${GA_ID}`}></script>
-        <script is:inline set:html={`window.dataLayer=window.dataLayer||[];function gtag(){dataLayer.push(arguments);}gtag('js',new Date());gtag('config','${GA_ID}');`} />
-      </>
-    )}
+    {/* Analytics (GA4 / GTM) is loaded by <CookieConsent> only after consent. */}
 
     {/* Smooth client-side navigation + shared-element transitions */}
     <ClientRouter />
   </head>
   <body>
-    {GTM_ID && (
-      <noscript set:html={`<iframe src="https://www.googletagmanager.com/ns.html?id=${GTM_ID}" height="0" width="0" style="display:none;visibility:hidden"></iframe>`} />
-    )}
     <a href="#main" class="sr-only focus:not-sr-only">Skip to content</a>
     <slot name="header" />
     <main id="main">
       <slot />
     </main>
     <slot name="footer" />
+    <AgeGate />
+    <CookieConsent gaId={GA_ID} gtmId={GTM_ID} />
     <Motion />
   </body>
 </html>
