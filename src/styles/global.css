@@ -162,6 +162,16 @@ img, picture, video {
   will-change: transform;
 }
 
+/* Hero video "Ken Burns" — slow continuous zoom for life (transform only). */
+@keyframes hero-zoom {
+  from { transform: scale(1.06); }
+  to { transform: scale(1.16); }
+}
+.hero-kenburns {
+  animation: hero-zoom 22s ease-in-out infinite alternate;
+  will-change: transform;
+}
+
 /* --- Holographic foil for premium album cards ---
    Static holographic tint + a sheen bar that travels using transform only
    (GPU-composited). No layout properties animated. */

@@ -5,23 +5,25 @@ import LiveCount from '@features/catalog/components/LiveCount.tsx';
 import { buildRetentionLink } from '@features/affiliate/utils/whiteLabel';
 
 // Hero visual. Defaults to the bundled optimized loop; override via env to swap
-// in a licensed image or a different video (CB affiliate promo, AI render, etc.).
+// in a different licensed image or video without touching code.
 const heroVideoMp4 = import.meta.env.PUBLIC_HERO_VIDEO_MP4?.trim() || '/hero/hero.mp4';
 const heroVideoWebm = import.meta.env.PUBLIC_HERO_VIDEO_WEBM?.trim();
 const heroImage = import.meta.env.PUBLIC_HERO_IMAGE?.trim();
 const heroPoster = import.meta.env.PUBLIC_HERO_POSTER?.trim() || heroImage || '/hero/hero-poster.jpg';
 const hasHeroVideo = Boolean(heroVideoWebm || heroVideoMp4);
 ---
-<section data-hero class="relative isolate overflow-hidden" aria-labelledby="hero-title">
+<section data-hero class="relative isolate overflow-hidden">
   {/* Decorative glow layers — parallaxed on scroll by GSAP */}
-  <div data-hero-glow class="pointer-events-none absolute inset-0 -z-10" aria-hidden="true">
+  <div data-hero-glow class="pointer-events-none absolute inset-0 -z-20" aria-hidden="true">
     <div class="absolute -left-24 -top-24 h-96 w-96 rounded-full bg-primary-700 opacity-30 blur-[120px]"></div>
     <div class="absolute -right-24 top-40 h-[28rem] w-[28rem] rounded-full bg-accent-500 opacity-25 blur-[140px]"></div>
   </div>
 
-  <div class="mx-auto grid max-w-6xl items-center gap-10 px-5 pb-20 pt-20 sm:px-8 sm:pt-28 lg:grid-cols-2 lg:gap-12 lg:pb-28">
-    {/* Text column */}
-    <div class="flex flex-col items-center text-center lg:items-start lg:text-left">
+  {/* NOTE: this grid wrapper is intentionally not `relative`, so on mobile the
+      media below escapes to the section and renders full-bleed behind the text. */}
+  <div class="mx-auto grid min-h-[86vh] w-full max-w-6xl items-center gap-10 px-5 py-20 sm:px-8 lg:min-h-0 lg:grid-cols-2 lg:gap-12 lg:py-28">
+    {/* Text column — overlays the video on mobile, left column on desktop */}
+    <div class="relative z-10 flex flex-col items-center text-center lg:items-start lg:text-left">
       <div data-hero-anim>
         <Badge variant="premium" size="md">Live cams · 18+</Badge>
       </div>
@@ -61,35 +63,36 @@ const hasHeroVideo = Boolean(heroVideoWebm || heroVideoMp4);
       </div>
     </div>
 
-    {/* Media column — cinematic looping visual, parallaxed on scroll. */}
-    <div class="order-first lg:order-last" data-hero-anim>
-      <div
-        data-hero-card
-        class="relative mx-auto aspect-[3/4] w-full max-w-sm max-h-[55vh] overflow-hidden rounded-(--radius-lg)
-               border border-border bg-bg shadow-[var(--shadow-card)] lg:max-h-none"
-      >
-        {hasHeroVideo ? (
-          <video
-            data-hero-video
-            poster={heroPoster}
-            muted
-            loop
-            playsinline
-            preload="none"
-            class="h-full w-full scale-105 object-cover"
-            aria-hidden="true"
-          >
-            {heroVideoWebm && <source src={heroVideoWebm} type="video/webm" />}
-            {heroVideoMp4 && <source src={heroVideoMp4} type="video/mp4" />}
-          </video>
-        ) : heroImage ? (
-          <img src={heroImage} alt="" class="h-full w-full object-cover" loading="eager" decoding="async" />
-        ) : null}
+    {/* Media — full-bleed background on mobile, right-column card on desktop */}
+    <div
+      data-hero-card
+      class="absolute inset-0 -z-10 overflow-hidden bg-bg
+             lg:relative lg:inset-auto lg:z-auto lg:order-last lg:mx-auto lg:aspect-[3/4] lg:w-full
+             lg:max-h-none lg:max-w-sm lg:rounded-(--radius-lg) lg:border lg:border-border lg:shadow-[var(--shadow-card)]"
+    >
+      {hasHeroVideo ? (
+        <video
+          data-hero-video
+          poster={heroPoster}
+          muted
+          loop
+          playsinline
+          preload="none"
+          class="hero-kenburns h-full w-full object-cover object-[50%_30%] lg:object-center"
+          aria-hidden="true"
+        >
+          {heroVideoWebm && <source src={heroVideoWebm} type="video/webm" />}
+          {heroVideoMp4 && <source src={heroVideoMp4} type="video/mp4" />}
+        </video>
+      ) : heroImage ? (
+        <img src={heroImage} alt="" class="h-full w-full object-cover object-[50%_30%] lg:object-center" loading="eager" decoding="async" />
+      ) : null}
 
-        {/* Brand tint + bottom vignette for depth and legibility */}
-        <div class="pointer-events-none absolute inset-0 z-10 opacity-35 mix-blend-overlay [background-image:var(--gradient-brand)]"></div>
-        <div class="pointer-events-none absolute inset-0 z-10 bg-gradient-to-t from-bg/75 via-transparent to-transparent"></div>
-      </div>
+      {/* Legibility scrims — strong on mobile (text sits over the video),
+          a subtle card vignette on desktop. */}
+      <div class="pointer-events-none absolute inset-0 bg-bg/45 lg:hidden"></div>
+      <div class="pointer-events-none absolute inset-0 bg-gradient-to-t from-bg via-bg/55 to-bg/20 lg:from-bg/75 lg:via-transparent lg:to-transparent"></div>
+      <div class="pointer-events-none absolute inset-0 opacity-30 mix-blend-overlay [background-image:var(--gradient-brand)]"></div>
     </div>
   </div>
 
@@ -120,23 +123,27 @@ const hasHeroVideo = Boolean(heroVideoWebm || heroVideoMp4);
 
     const reduce = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
     const items = gsap.utils.toArray<HTMLElement>('[data-hero-anim]');
+    const card = hero.querySelector<HTMLElement>('[data-hero-card]');
     if (reduce) {
       gsap.set(items, { opacity: 1, y: 0 });
+      if (card) gsap.set(card, { opacity: 1 });
       return;
     }
 
-    // Cinematic intro: staggered rise + fade.
+    // Cinematic intro: text rises + fades in; the media fades in behind it.
+    if (card) gsap.from(card, { opacity: 0, duration: 1.1, ease: 'power2.out' });
     gsap.from(items, {
       opacity: 0,
       y: 34,
       duration: 0.9,
       ease: 'power3.out',
       stagger: 0.1,
+      delay: 0.15,
     });
 
     // Scroll parallax — layers drift at different speeds as the hero exits.
     const scrub = { trigger: hero, start: 'top top', end: 'bottom top', scrub: true };
-    gsap.to('[data-hero-card]', { yPercent: -12, ease: 'none', scrollTrigger: scrub });
+    gsap.to(card, { yPercent: -10, ease: 'none', scrollTrigger: scrub });
     gsap.to('[data-hero-glow]', { yPercent: 22, ease: 'none', scrollTrigger: scrub });
   }
 
