@@ -3,11 +3,19 @@ import { defineConfig } from 'astro/config';
 import react from '@astrojs/react';
 import sitemap from '@astrojs/sitemap';
 import netlify from '@astrojs/netlify';
+import node from '@astrojs/node';
 import tailwindcss from '@tailwindcss/vite';
 
 // Site URL is configurable via env so nothing is hardcoded.
 // Falls back to the production domain for build-time absolute URLs (canonical, OG, sitemap).
 const SITE = process.env.PUBLIC_SITE_URL ?? 'https://xlugar.com';
+
+// Deploy target selects the adapter. Default = Netlify (serverless). Set
+// DEPLOY_TARGET=node for a self-hosted VPS build (standalone Node server that
+// serves the prerendered pages AND the on-demand /api/rooms proxy).
+const DEPLOY_TARGET = process.env.DEPLOY_TARGET ?? 'netlify';
+const adapter =
+  DEPLOY_TARGET === 'node' ? node({ mode: 'standalone' }) : netlify();
 
 // https://astro.build/config
 export default defineConfig({
@@ -17,7 +25,7 @@ export default defineConfig({
   // only match `/api/rooms/`, breaking the client `fetch('/api/rooms')` (catalog +
   // live counter). Canonical consistency is handled in Seo.astro/schema instead,
   // and the default 'ignore' serves both slash forms.
-  adapter: netlify(),
+  adapter,
   integrations: [
     react(),
     sitemap({
