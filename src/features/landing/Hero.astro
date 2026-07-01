@@ -2,43 +2,34 @@
 import Button from '@components/ui/Button.astro';
 import Badge from '@components/ui/Badge.astro';
 import LiveCount from '@features/catalog/components/LiveCount.tsx';
-import HeroModelArt from './HeroModelArt.astro';
 import { buildRetentionLink } from '@features/affiliate/utils/whiteLabel';
 
-// Hero visual, all optional via env so no missing-file 404s until an asset is
-// provided. Drop a LICENSED image/video (CB affiliate promo tool, AI render, or
-// stock) and point these at it; otherwise the compliant SVG silhouette shows.
-const heroImage = import.meta.env.PUBLIC_HERO_IMAGE?.trim();
+// Hero visual. Defaults to the bundled optimized loop; override via env to swap
+// in a licensed image or a different video (CB affiliate promo, AI render, etc.).
+const heroVideoMp4 = import.meta.env.PUBLIC_HERO_VIDEO_MP4?.trim() || '/hero/hero.mp4';
 const heroVideoWebm = import.meta.env.PUBLIC_HERO_VIDEO_WEBM?.trim();
-const heroVideoMp4 = import.meta.env.PUBLIC_HERO_VIDEO_MP4?.trim();
-const heroPoster = import.meta.env.PUBLIC_HERO_POSTER?.trim() || heroImage;
+const heroImage = import.meta.env.PUBLIC_HERO_IMAGE?.trim();
+const heroPoster = import.meta.env.PUBLIC_HERO_POSTER?.trim() || heroImage || '/hero/hero-poster.jpg';
 const hasHeroVideo = Boolean(heroVideoWebm || heroVideoMp4);
 ---
-<section class="relative isolate overflow-hidden" aria-labelledby="hero-title">
-  {/* Decorative parallax glow layers — transform-only, behind content */}
-  <div class="pointer-events-none absolute inset-0 -z-10" aria-hidden="true">
-    <div
-      data-parallax="0.18"
-      class="absolute -left-24 -top-24 h-96 w-96 rounded-full bg-primary-700 opacity-30 blur-[120px]"
-    ></div>
-    <div
-      data-parallax="0.1"
-      class="absolute -right-24 top-40 h-[28rem] w-[28rem] rounded-full bg-accent-500 opacity-25 blur-[140px]"
-    ></div>
+<section data-hero class="relative isolate overflow-hidden" aria-labelledby="hero-title">
+  {/* Decorative glow layers — parallaxed on scroll by GSAP */}
+  <div data-hero-glow class="pointer-events-none absolute inset-0 -z-10" aria-hidden="true">
+    <div class="absolute -left-24 -top-24 h-96 w-96 rounded-full bg-primary-700 opacity-30 blur-[120px]"></div>
+    <div class="absolute -right-24 top-40 h-[28rem] w-[28rem] rounded-full bg-accent-500 opacity-25 blur-[140px]"></div>
   </div>
 
   <div class="mx-auto grid max-w-6xl items-center gap-10 px-5 pb-20 pt-20 sm:px-8 sm:pt-28 lg:grid-cols-2 lg:gap-12 lg:pb-28">
     {/* Text column */}
     <div class="flex flex-col items-center text-center lg:items-start lg:text-left">
-      <div data-reveal>
+      <div data-hero-anim>
         <Badge variant="premium" size="md">Live cams · 18+</Badge>
       </div>
 
       <h1
         id="hero-title"
         class="mt-6 max-w-3xl text-balance text-5xl leading-[1.04] text-fg sm:text-6xl md:text-7xl"
-        data-reveal
-        style="--reveal-delay: 60ms"
+        data-hero-anim
         transition:name="hero-title"
       >
         Thousands of models,
@@ -47,20 +38,16 @@ const hasHeroVideo = Boolean(heroVideoWebm || heroVideoMp4);
         </span>
       </h1>
 
-      <p
-        class="mt-6 max-w-xl text-lg text-fg-muted"
-        data-reveal
-        style="--reveal-delay: 120ms"
-      >
+      <p class="mt-6 max-w-xl text-lg text-fg-muted" data-hero-anim>
         A real-time catalog of live cam models, ranked by who's drawing the biggest crowd this minute and
         refreshed continuously. Free to watch — find your room in seconds.
       </p>
 
-      <div data-reveal style="--reveal-delay: 150ms">
+      <div data-hero-anim>
         <LiveCount client:visible />
       </div>
 
-      <div class="mt-9 flex flex-wrap items-center justify-center gap-4 lg:justify-start" data-reveal style="--reveal-delay: 180ms">
+      <div class="mt-9 flex flex-wrap items-center justify-center gap-4 lg:justify-start" data-hero-anim>
         <Button
           href={buildRetentionLink('home')}
           variant="gradient"
@@ -74,18 +61,13 @@ const hasHeroVideo = Boolean(heroVideoWebm || heroVideoMp4);
       </div>
     </div>
 
-    {/* Model column — looping 3D render. Video on top on mobile, right on desktop.
-        The wrapper reserves space (aspect ratio -> no CLS) and its brand gradient
-        doubles as the placeholder until the video/poster assets are in place. */}
-    <div class="order-first lg:order-last" data-reveal style="--reveal-delay: 100ms">
+    {/* Media column — cinematic looping visual, parallaxed on scroll. */}
+    <div class="order-first lg:order-last" data-hero-anim>
       <div
+        data-hero-card
         class="relative mx-auto aspect-[3/4] w-full max-w-sm max-h-[55vh] overflow-hidden rounded-(--radius-lg)
-               border border-border [background-image:var(--gradient-brand)] lg:max-h-none"
+               border border-border bg-bg shadow-[var(--shadow-card)] lg:max-h-none"
       >
-        {/* Base layer: compliant SVG silhouette (shows until a real asset is set) */}
-        <HeroModelArt />
-
-        {/* Real asset (licensed) — video preferred, else image. Env-gated. */}
         {hasHeroVideo ? (
           <video
             data-hero-video
@@ -94,24 +76,19 @@ const hasHeroVideo = Boolean(heroVideoWebm || heroVideoMp4);
             loop
             playsinline
             preload="none"
-            class="relative z-[2] h-full w-full object-cover"
+            class="h-full w-full scale-105 object-cover"
             aria-hidden="true"
           >
             {heroVideoWebm && <source src={heroVideoWebm} type="video/webm" />}
             {heroVideoMp4 && <source src={heroVideoMp4} type="video/mp4" />}
           </video>
         ) : heroImage ? (
-          <img
-            src={heroImage}
-            alt=""
-            class="relative z-[2] h-full w-full object-cover"
-            loading="eager"
-            decoding="async"
-          />
+          <img src={heroImage} alt="" class="h-full w-full object-cover" loading="eager" decoding="async" />
         ) : null}
 
-        {/* Soft inner vignette for legibility/depth over the render */}
-        <div class="pointer-events-none absolute inset-0 z-10 bg-gradient-to-t from-bg/70 via-transparent to-transparent"></div>
+        {/* Brand tint + bottom vignette for depth and legibility */}
+        <div class="pointer-events-none absolute inset-0 z-10 opacity-35 mix-blend-overlay [background-image:var(--gradient-brand)]"></div>
+        <div class="pointer-events-none absolute inset-0 z-10 bg-gradient-to-t from-bg/75 via-transparent to-transparent"></div>
       </div>
     </div>
   </div>
@@ -127,3 +104,41 @@ const hasHeroVideo = Boolean(heroVideoWebm || heroVideoMp4);
     </svg>
   </a>
 </section>
+
+<script>
+  import gsap from 'gsap';
+  import { ScrollTrigger } from 'gsap/ScrollTrigger';
+
+  gsap.registerPlugin(ScrollTrigger);
+
+  function initHeroCinematic() {
+    const hero = document.querySelector<HTMLElement>('[data-hero]');
+    if (!hero) return;
+
+    // Clear any triggers from a previous page (View Transitions re-run this).
+    ScrollTrigger.getAll().forEach((t) => t.kill());
+
+    const reduce = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+    const items = gsap.utils.toArray<HTMLElement>('[data-hero-anim]');
+    if (reduce) {
+      gsap.set(items, { opacity: 1, y: 0 });
+      return;
+    }
+
+    // Cinematic intro: staggered rise + fade.
+    gsap.from(items, {
+      opacity: 0,
+      y: 34,
+      duration: 0.9,
+      ease: 'power3.out',
+      stagger: 0.1,
+    });
+
+    // Scroll parallax — layers drift at different speeds as the hero exits.
+    const scrub = { trigger: hero, start: 'top top', end: 'bottom top', scrub: true };
+    gsap.to('[data-hero-card]', { yPercent: -12, ease: 'none', scrollTrigger: scrub });
+    gsap.to('[data-hero-glow]', { yPercent: 22, ease: 'none', scrollTrigger: scrub });
+  }
+
+  document.addEventListener('astro:page-load', initHeroCinematic);
+</script>
