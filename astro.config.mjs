@@ -13,6 +13,10 @@ const SITE = process.env.PUBLIC_SITE_URL ?? 'https://xlugar.com';
 export default defineConfig({
   site: SITE,
   output: 'static',
+  // NOTE: do NOT set `trailingSlash: 'always'` — it makes the on-demand API route
+  // only match `/api/rooms/`, breaking the client `fetch('/api/rooms')` (catalog +
+  // live counter). Canonical consistency is handled in Seo.astro/schema instead,
+  // and the default 'ignore' serves both slash forms.
   adapter: netlify(),
   integrations: [
     react(),
