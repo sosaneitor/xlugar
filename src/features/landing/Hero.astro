@@ -2,7 +2,17 @@
 import Button from '@components/ui/Button.astro';
 import Badge from '@components/ui/Badge.astro';
 import LiveCount from '@features/catalog/components/LiveCount.tsx';
+import HeroModelArt from './HeroModelArt.astro';
 import { buildRetentionLink } from '@features/affiliate/utils/whiteLabel';
+
+// Hero visual, all optional via env so no missing-file 404s until an asset is
+// provided. Drop a LICENSED image/video (CB affiliate promo tool, AI render, or
+// stock) and point these at it; otherwise the compliant SVG silhouette shows.
+const heroImage = import.meta.env.PUBLIC_HERO_IMAGE?.trim();
+const heroVideoWebm = import.meta.env.PUBLIC_HERO_VIDEO_WEBM?.trim();
+const heroVideoMp4 = import.meta.env.PUBLIC_HERO_VIDEO_MP4?.trim();
+const heroPoster = import.meta.env.PUBLIC_HERO_POSTER?.trim() || heroImage;
+const hasHeroVideo = Boolean(heroVideoWebm || heroVideoMp4);
 ---
 <section class="relative isolate overflow-hidden" aria-labelledby="hero-title">
   {/* Decorative parallax glow layers — transform-only, behind content */}
@@ -72,21 +82,36 @@ import { buildRetentionLink } from '@features/affiliate/utils/whiteLabel';
         class="relative mx-auto aspect-[3/4] w-full max-w-sm max-h-[55vh] overflow-hidden rounded-(--radius-lg)
                border border-border [background-image:var(--gradient-brand)] lg:max-h-none"
       >
+        {/* Base layer: compliant SVG silhouette (shows until a real asset is set) */}
+        <HeroModelArt />
+
+        {/* Real asset (licensed) — video preferred, else image. Env-gated. */}
+        {hasHeroVideo ? (
+          <video
+            data-hero-video
+            poster={heroPoster}
+            muted
+            loop
+            playsinline
+            preload="none"
+            class="relative z-[2] h-full w-full object-cover"
+            aria-hidden="true"
+          >
+            {heroVideoWebm && <source src={heroVideoWebm} type="video/webm" />}
+            {heroVideoMp4 && <source src={heroVideoMp4} type="video/mp4" />}
+          </video>
+        ) : heroImage ? (
+          <img
+            src={heroImage}
+            alt=""
+            class="relative z-[2] h-full w-full object-cover"
+            loading="eager"
+            decoding="async"
+          />
+        ) : null}
+
         {/* Soft inner vignette for legibility/depth over the render */}
         <div class="pointer-events-none absolute inset-0 z-10 bg-gradient-to-t from-bg/70 via-transparent to-transparent"></div>
-        <video
-          data-hero-video
-          poster="/hero/model-poster.webp"
-          muted
-          loop
-          playsinline
-          preload="none"
-          class="h-full w-full object-cover"
-          aria-hidden="true"
-        >
-          <source src="/hero/model.webm" type="video/webm" />
-          <source src="/hero/model.mp4" type="video/mp4" />
-        </video>
       </div>
     </div>
   </div>
