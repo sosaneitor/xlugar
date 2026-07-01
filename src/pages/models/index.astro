@@ -6,18 +6,30 @@ import Section from '@components/ui/Section.astro';
 import LiveCatalog from '@features/catalog/components/LiveCatalog.tsx';
 import AdSlot from '@features/ads/components/AdSlot.astro';
 import { CATEGORIES } from '@features/catalog/data/categories';
-import { breadcrumbSchema } from '@lib/schema';
+import { breadcrumbSchema, collectionPageSchema, itemListSchema } from '@lib/schema';
+
+const catalogDescription =
+  'Browse every cam model online right now. A real-time catalog ranked by viewers, with language, category and audience filters. Refreshed every 60 seconds. 18+.';
 
 const breadcrumbs = breadcrumbSchema([
   { name: 'Home', path: '/' },
   { name: 'Models', path: '/models' },
 ]);
+const collection = collectionPageSchema({
+  name: 'Live Cam Models — Full Catalog',
+  description: catalogDescription,
+  path: '/models',
+});
+const categoryList = itemListSchema(
+  CATEGORIES.map((c) => ({ name: c.label, path: `/models/${c.slug}` })),
+  'Cam categories',
+);
 ---
 <BaseLayout
   title="Live Cam Models — Full Catalog Online Now"
-  description="Browse every cam model online right now. A real-time catalog ranked by viewers, with language, category and audience filters. Refreshed every 60 seconds. 18+."
+  description={catalogDescription}
   canonical="/models"
-  schemas={[breadcrumbs]}
+  schemas={[breadcrumbs, collection, categoryList]}
 >
   <SiteHeader slot="header" />
 
