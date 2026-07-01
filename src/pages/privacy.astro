@@ -1,0 +1,70 @@
+---
+import BaseLayout from '@layouts/BaseLayout.astro';
+import SiteHeader from '@components/SiteHeader.astro';
+import SiteFooter from '@components/SiteFooter.astro';
+import Section from '@components/ui/Section.astro';
+import { SITE } from '@lib/site';
+
+const updated = 'June 30, 2026';
+---
+<BaseLayout
+  title="Privacy Policy"
+  description="How xLugar handles data, cookies and analytics, and the third-party services we use. 18+ only."
+  canonical="/privacy"
+>
+  <SiteHeader slot="header" />
+
+  <Section labelledby="privacy-title">
+    <article class="mx-auto max-w-2xl">
+      <nav aria-label="Breadcrumb" class="text-sm text-fg-subtle" data-reveal>
+        <a href="/" class="hover:text-premium-300">Home</a> <span aria-hidden="true">/</span>
+        <span class="text-fg-muted">Privacy</span>
+      </nav>
+      <h1 class="mt-4 text-4xl text-fg sm:text-5xl" data-reveal>Privacy Policy</h1>
+      <p class="mt-2 text-sm text-fg-subtle" data-reveal>Last updated: {updated}</p>
+
+      <div class="mt-8 flex flex-col gap-5 text-fg-muted" data-reveal style="--reveal-delay: 80ms">
+        <p>
+          This policy explains what information {SITE.name} collects when you use this site and how it is used.
+          {SITE.name} is a discovery site for live cam models; we do not require registration and we do not ask
+          you for personal information to browse.
+        </p>
+
+        <h2 class="mt-6 text-2xl text-fg">Information we collect</h2>
+        <p>
+          We do not collect names, email addresses or payment details. Like most websites, our hosting and
+          analytics providers automatically process standard technical data such as your IP address, browser
+          type, device and the pages you visit, in order to serve the site and understand aggregate traffic.
+        </p>
+
+        <h2 class="mt-6 text-2xl text-fg">Cookies and analytics</h2>
+        <p>
+          We may use privacy-conscious analytics (for example Google Analytics / Google Tag Manager) to measure
+          traffic in aggregate. These tools may set cookies or similar identifiers. You can block or delete
+          cookies in your browser settings; the site remains usable without them.
+        </p>
+
+        <h2 class="mt-6 text-2xl text-fg">Third-party services</h2>
+        <p>
+          When you open a room or click a link, you are taken to Chaturbate (or a co-branded Chaturbate
+          property). Those destinations are operated by third parties and governed by their own privacy
+          policies. We encourage you to review them. {SITE.name} participates in the Chaturbate affiliate
+          program and may pass non-personal campaign parameters to attribute referrals.
+        </p>
+
+        <h2 class="mt-6 text-2xl text-fg">Age</h2>
+        <p>
+          This site is strictly for adults 18 or older (21 where required). We do not knowingly collect
+          information from minors.
+        </p>
+
+        <h2 class="mt-6 text-2xl text-fg">Contact</h2>
+        <p>
+          Questions about this policy? Email <a href="mailto:privacy@xlugar.com" class="text-primary-300 underline hover:text-premium-300">privacy@xlugar.com</a>.
+        </p>
+      </div>
+    </article>
+  </Section>
+
+  <SiteFooter slot="footer" />
+</BaseLayout>

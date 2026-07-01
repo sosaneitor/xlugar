@@ -1,0 +1,68 @@
+---
+import BaseLayout from '@layouts/BaseLayout.astro';
+import SiteHeader from '@components/SiteHeader.astro';
+import SiteFooter from '@components/SiteFooter.astro';
+import Section from '@components/ui/Section.astro';
+import SectionHeading from '@components/ui/SectionHeading.astro';
+import { CATEGORIES } from '@features/catalog/data/categories';
+import { breadcrumbSchema, collectionPageSchema, itemListSchema } from '@lib/schema';
+
+const pageDescription =
+  'Browse live cam categories on xLugar — Latina, Asian, Ebony, MILF, couples and more. Every category is a live, self-updating list of models streaming right now. 18+.';
+
+const breadcrumbs = breadcrumbSchema([
+  { name: 'Home', path: '/' },
+  { name: 'Categories', path: '/categories' },
+]);
+const collection = collectionPageSchema({
+  name: 'Live Cam Categories',
+  description: pageDescription,
+  path: '/categories',
+});
+const categoryList = itemListSchema(
+  CATEGORIES.map((c) => ({ name: c.label, path: `/models/${c.slug}` })),
+  'Live cam categories',
+);
+---
+<BaseLayout
+  title="Live Cam Categories — Browse Every Scene"
+  description={pageDescription}
+  canonical="/categories"
+  schemas={[breadcrumbs, collection, categoryList]}
+>
+  <SiteHeader slot="header" />
+
+  <Section labelledby="categories-title">
+    <header class="flex max-w-3xl flex-col gap-4" data-reveal>
+      <nav aria-label="Breadcrumb" class="text-sm text-fg-subtle">
+        <a href="/" class="hover:text-premium-300">Home</a> <span aria-hidden="true">/</span>
+        <span class="text-fg-muted">Categories</span>
+      </nav>
+      <h1 class="text-4xl text-fg sm:text-5xl">Live cam categories</h1>
+      <p class="text-fg-muted">
+        Pick a scene and jump straight into models streaming live right now. Every category below is a
+        real-time list, ranked by current viewers and refreshed every minute.
+      </p>
+    </header>
+
+    <ul class="mt-10 grid gap-4 sm:grid-cols-2 lg:grid-cols-3" data-reveal-group data-reveal-step="60">
+      {CATEGORIES.map((c) => (
+        <li>
+          <a
+            href={`/models/${c.slug}`}
+            class="flex h-full flex-col gap-3 rounded-(--radius-lg) border border-border bg-surface p-6
+                   transition-[transform,border-color] duration-(--dur-mid) ease-(--ease-out-soft)
+                   hover:-translate-y-1 hover:border-premium-500 motion-reduce:transform-none"
+            data-reveal
+          >
+            <h2 class="text-xl text-fg">{c.label}</h2>
+            <p class="text-sm text-fg-muted">{c.description}</p>
+            <span class="mt-auto text-sm text-premium-300">View live {c.label} cams →</span>
+          </a>
+        </li>
+      ))}
+    </ul>
+  </Section>
+
+  <SiteFooter slot="footer" />
+</BaseLayout>

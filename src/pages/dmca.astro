@@ -1,0 +1,59 @@
+---
+import BaseLayout from '@layouts/BaseLayout.astro';
+import SiteHeader from '@components/SiteHeader.astro';
+import SiteFooter from '@components/SiteFooter.astro';
+import Section from '@components/ui/Section.astro';
+import { SITE } from '@lib/site';
+---
+<BaseLayout
+  title="DMCA / Copyright Policy"
+  description="How to report copyright or content concerns to xLugar, and our takedown procedure."
+  canonical="/dmca"
+>
+  <SiteHeader slot="header" />
+
+  <Section labelledby="dmca-title">
+    <article class="mx-auto max-w-2xl">
+      <nav aria-label="Breadcrumb" class="text-sm text-fg-subtle" data-reveal>
+        <a href="/" class="hover:text-premium-300">Home</a> <span aria-hidden="true">/</span>
+        <span class="text-fg-muted">DMCA</span>
+      </nav>
+      <h1 class="mt-4 text-4xl text-fg sm:text-5xl" data-reveal>DMCA / Copyright Policy</h1>
+
+      <div class="mt-8 flex flex-col gap-5 text-fg-muted" data-reveal style="--reveal-delay: 80ms">
+        <p>
+          {SITE.name} respects the intellectual property rights of others and responds to valid notices of
+          alleged infringement. Because {SITE.name} does not host streams or store video, most content concerns
+          are best directed to the platform that hosts the material (Chaturbate). We will, however, promptly
+          remove links or preview snapshots from this site where appropriate.
+        </p>
+
+        <h2 class="mt-6 text-2xl text-fg">Filing a notice</h2>
+        <p>To report content, email <a href="mailto:dmca@xlugar.com" class="text-primary-300 underline hover:text-premium-300">dmca@xlugar.com</a> with:</p>
+        <ul class="flex list-disc flex-col gap-2 pl-6">
+          <li>Identification of the copyrighted work or right you claim was infringed.</li>
+          <li>The exact URL(s) on this site where the material appears.</li>
+          <li>Your contact information (name, email, address).</li>
+          <li>A statement that you have a good-faith belief the use is not authorized by the owner, its agent, or the law.</li>
+          <li>A statement, under penalty of perjury, that the information is accurate and that you are the owner or authorized to act on the owner's behalf.</li>
+          <li>Your physical or electronic signature.</li>
+        </ul>
+
+        <h2 class="mt-6 text-2xl text-fg">Counter-notice and content removal requests</h2>
+        <p>
+          If you are a performer and want your previews or links removed from {SITE.name}, email
+          <a href="mailto:dmca@xlugar.com" class="text-primary-300 underline hover:text-premium-300">dmca@xlugar.com</a>
+          from the account associated with your profile and we will remove them promptly.
+        </p>
+
+        <h2 class="mt-6 text-2xl text-fg">Repeat infringers</h2>
+        <p>
+          We may remove links and take other appropriate action in cases of repeated or clearly valid
+          infringement claims.
+        </p>
+      </div>
+    </article>
+  </Section>
+
+  <SiteFooter slot="footer" />
+</BaseLayout>

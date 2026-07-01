@@ -7,7 +7,7 @@ import { SITE } from '@lib/site';
 ---
 <BaseLayout
   title="About xLugar"
-  description="What xLugar is, how the live catalog works, and our 18+ adults-only policy. Independent discovery for live cam models."
+  description="xLugar is a live cam site: thousands of models streaming right now, ranked by live audience and refreshed every minute. Free to watch. 18+ only."
   canonical="/about"
 >
   <SiteHeader slot="header" />
@@ -18,36 +18,38 @@ import { SITE } from '@lib/site';
 
       <div class="mt-8 flex flex-col gap-5 text-fg-muted" data-reveal style="--reveal-delay: 80ms">
         <p>
-          {SITE.name} is an independent discovery layer for live cam models. We don't host streams or store
-          video — we surface who is broadcasting publicly right now and rank rooms by live audience so you can
-          find a great room in seconds. Every preview you see is a periodically-refreshed snapshot, not a
-          recording.
+          {SITE.name} is a live cam site built around one idea: help you find a great room fast. Thousands of
+          models are broadcasting at any moment, and we put the ones with the biggest live audiences in front of
+          you first — sorted, filtered and refreshed every minute so you're always looking at who is actually
+          online right now.
         </p>
         <p>
-          When you open a room, you're taken directly to the performer's live cam to watch and chat. Browsing
-          and watching are free, and you only need an account if you want to interact, tip, or follow your
-          favorites.
+          Browsing and watching are free. Open any room and you go straight to the live stream, where you can
+          watch, chat, tip and follow your favorites. You only need a free account if you want to join in — no
+          sign-up is required just to look around.
+        </p>
+
+        <h2 class="mt-6 text-2xl text-fg">Always live, never stale</h2>
+        <p>
+          Every list on {SITE.name} — the home grid, the full catalog and each category — is ranked by current
+          viewers and reordered continuously as audiences shift. The previews are snapshots that refresh about
+          once a minute so the page stays fast; the real action is always inside the room. Models come and go all
+          day, so the lineup is never the same twice.
         </p>
 
         <h2 class="mt-6 text-2xl text-fg">Adults only — 18+</h2>
         <p>
           {SITE.name} contains adult content and is strictly for adults aged 18 or older (21 where required by
           local law). All performers are verified adults. If you are a minor, or if adult content is illegal
-          where you live, please leave now.
+          where you live, please leave now. See our <a href="/terms" class="text-primary-300 underline hover:text-premium-300">Terms</a>,
+          <a href="/privacy" class="text-primary-300 underline hover:text-premium-300">Privacy Policy</a> and
+          <a href="/2257" class="text-primary-300 underline hover:text-premium-300">18 U.S.C. 2257 statement</a>.
         </p>
 
-        <h2 class="mt-6 text-2xl text-fg">How rooms stay current</h2>
-        <p>
-          The catalog reads a live feed of public rooms and reorders it around current viewer counts. Snapshots
-          and rankings refresh roughly every minute, so the lineup you see reflects who is actually online at
-          that moment. Models come and go throughout the day, so the grid is never the same twice.
-        </p>
-
-        <h2 class="mt-6 text-2xl text-fg">Affiliate disclosure</h2>
-        <p>
-          {SITE.name} participates in the Chaturbate affiliate program. When you visit a room or sign up through
-          a link on this site, we may earn a commission at no extra cost to you. This never affects which rooms
-          appear or how they're ranked — ordering is driven purely by live viewer counts.
+        <p class="text-sm text-fg-subtle">
+          {SITE.name} participates in the Chaturbate affiliate program and may earn a commission from links on
+          this site, at no extra cost to you. This never affects how rooms are ranked — ordering is driven purely
+          by live viewer counts.
         </p>
       </div>
     </article>

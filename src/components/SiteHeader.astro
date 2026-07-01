@@ -3,7 +3,7 @@ import { buildRetentionLink } from '@features/affiliate/utils/whiteLabel';
 
 const links = [
   { href: '/models', label: 'Models' },
-  { href: '/models/latina', label: 'Categories' },
+  { href: '/categories', label: 'Categories' },
   { href: '/blog', label: 'Blog' },
   { href: '/about', label: 'About' },
 ];
@@ -18,22 +18,56 @@ const ctaExternal = true;
     <a href="/" class="font-display text-xl tracking-tight text-fg" transition:name="brand">
       x<span class="text-primary-500">Lugar</span>
     </a>
-    <ul class="hidden items-center gap-7 text-sm text-fg-muted md:flex">
-      {links.map((l) => (
-        <li>
-          <a href={l.href} class="transition-colors duration-(--dur-fast) hover:text-premium-300">{l.label}</a>
-        </li>
-      ))}
-    </ul>
-    <a
-      href={ctaHref}
-      rel={ctaExternal ? 'sponsored noopener noreferrer' : undefined}
-      target={ctaExternal ? '_blank' : undefined}
-      class="rounded-(--radius-md) bg-primary-500 px-4 py-2 text-sm font-medium text-on-primary
-             transition-[transform,background-color] duration-(--dur-fast) hover:-translate-y-0.5
-             hover:bg-primary-600 motion-reduce:transform-none"
-    >
-      Enter live
-    </a>
+
+    <div class="flex items-center gap-3">
+      {/* Desktop links */}
+      <ul class="hidden items-center gap-7 text-sm text-fg-muted md:flex">
+        {links.map((l) => (
+          <li>
+            <a href={l.href} class="transition-colors duration-(--dur-fast) hover:text-premium-300">{l.label}</a>
+          </li>
+        ))}
+      </ul>
+
+      <a
+        href={ctaHref}
+        rel={ctaExternal ? 'sponsored noopener noreferrer' : undefined}
+        target={ctaExternal ? '_blank' : undefined}
+        class="rounded-(--radius-md) bg-primary-500 px-4 py-2 text-sm font-medium text-on-primary
+               transition-[transform,background-color] duration-(--dur-fast) hover:-translate-y-0.5
+               hover:bg-primary-600 motion-reduce:transform-none"
+      >
+        Enter live
+      </a>
+
+      {/* Mobile menu — native <details> disclosure (no JS, survives View Transitions) */}
+      <details class="relative md:hidden">
+        <summary
+          class="flex h-9 w-9 cursor-pointer list-none items-center justify-center rounded-(--radius-md)
+                 border border-border-strong text-fg [&::-webkit-details-marker]:hidden"
+          aria-label="Open menu"
+        >
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true">
+            <path d="M4 6h16M4 12h16M4 18h16" />
+          </svg>
+        </summary>
+        <ul
+          class="absolute right-0 top-full mt-2 w-52 rounded-(--radius-lg) border border-border-strong bg-bg p-2
+                 text-sm text-fg-muted shadow-[var(--shadow-card)]"
+        >
+          {links.map((l) => (
+            <li>
+              <a
+                href={l.href}
+                class="block rounded-(--radius-md) px-3 py-2 transition-colors duration-(--dur-fast)
+                       hover:bg-surface hover:text-premium-300"
+              >
+                {l.label}
+              </a>
+            </li>
+          ))}
+        </ul>
+      </details>
+    </div>
   </nav>
 </header>

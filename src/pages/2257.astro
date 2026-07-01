@@ -1,0 +1,49 @@
+---
+import BaseLayout from '@layouts/BaseLayout.astro';
+import SiteHeader from '@components/SiteHeader.astro';
+import SiteFooter from '@components/SiteFooter.astro';
+import Section from '@components/ui/Section.astro';
+import { SITE } from '@lib/site';
+---
+<BaseLayout
+  title="18 U.S.C. 2257 Compliance Statement"
+  description="xLugar record-keeping compliance statement. xLugar does not produce or host adult content; all content is provided by third parties."
+  canonical="/2257"
+>
+  <SiteHeader slot="header" />
+
+  <Section labelledby="s2257-title">
+    <article class="mx-auto max-w-2xl">
+      <nav aria-label="Breadcrumb" class="text-sm text-fg-subtle" data-reveal>
+        <a href="/" class="hover:text-premium-300">Home</a> <span aria-hidden="true">/</span>
+        <span class="text-fg-muted">2257</span>
+      </nav>
+      <h1 class="mt-4 text-4xl text-fg sm:text-5xl" data-reveal>18 U.S.C. § 2257 Statement</h1>
+
+      <div class="mt-8 flex flex-col gap-5 text-fg-muted" data-reveal style="--reveal-delay: 80ms">
+        <p>
+          {SITE.name} is not a producer (primary or secondary) of any of the content accessible through this
+          site, as defined in 18 U.S.C. § 2257 and § 2257A. {SITE.name} does not host, produce, upload, record
+          or store any images or video. The site displays periodically-refreshed preview snapshots and links to
+          live streams that are hosted and operated by third parties.
+        </p>
+        <p>
+          All performers appearing on the linked platform are verified adults. The records required by 18 U.S.C.
+          § 2257 for content available through the linked service are kept by the respective content producers
+          and by the operator of that platform, Chaturbate. Please refer to the 18 U.S.C. § 2257 statement and
+          custodian of records information published on the destination platform.
+        </p>
+        <p>
+          All models, actors and other persons that appear in any visual depiction of actual or simulated sexual
+          conduct accessible via this site were over the age of 18 at the time the material was created.
+        </p>
+        <p>
+          Questions regarding this statement can be sent to
+          <a href="mailto:legal@xlugar.com" class="text-primary-300 underline hover:text-premium-300">legal@xlugar.com</a>.
+        </p>
+      </div>
+    </article>
+  </Section>
+
+  <SiteFooter slot="footer" />
+</BaseLayout>

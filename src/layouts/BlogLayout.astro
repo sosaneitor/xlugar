@@ -5,6 +5,7 @@ import SiteFooter from '@components/SiteFooter.astro';
 import Section from '@components/ui/Section.astro';
 import AdSlot from '@features/ads/components/AdSlot.astro';
 import { articleSchema, breadcrumbSchema } from '@lib/schema';
+import { CATEGORIES, FEATURED_CATEGORIES, getCategoryBySlug } from '@features/catalog/data/categories';
 import type { CollectionEntry } from 'astro:content';
 
 interface Props {
@@ -13,6 +14,13 @@ interface Props {
 const { entry } = Astro.props;
 const { data } = entry;
 const path = `/blog/${entry.slug}`;
+
+// Contextual internal links: use the post's declared related categories, else
+// fall back to the featured set so every article links out to category pages.
+const relatedCats = (data.relatedCategories ?? [])
+  .map((slug) => getCategoryBySlug(slug))
+  .filter((c): c is (typeof CATEGORIES)[number] => Boolean(c));
+const linkedCategories = relatedCats.length > 0 ? relatedCats : FEATURED_CATEGORIES;
 
 const schemas = [
   breadcrumbSchema([
@@ -67,6 +75,27 @@ const dateFmt = new Intl.DateTimeFormat('en-US', {
       <div class="post-body mt-10 flex flex-col gap-5 text-fg-muted">
         <slot />
       </div>
+
+      {/* Contextual internal links to live category pages + catalog CTA. */}
+      <nav class="mt-14 border-t border-border pt-8" aria-label="Related categories">
+        <h2 class="text-sm uppercase tracking-[0.14em] text-fg-subtle">Explore live categories</h2>
+        <ul class="mt-4 flex flex-wrap gap-3">
+          {linkedCategories.map((c) => (
+            <li>
+              <a
+                href={`/models/${c.slug}`}
+                class="rounded-(--radius-pill) border border-border-strong bg-surface px-4 py-2 text-sm text-fg-muted
+                       transition-colors duration-(--dur-fast) hover:border-premium-500 hover:text-premium-300"
+              >
+                {c.label} cams
+              </a>
+            </li>
+          ))}
+        </ul>
+        <p class="mt-6">
+          <a href="/models" class="text-premium-300 hover:text-premium-400">Browse the full live catalog →</a>
+        </p>
+      </nav>
     </div>
   </Section>
 

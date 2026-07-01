@@ -69,9 +69,36 @@
     update();
   }
 
+  function initHeroVideo() {
+    const reduce = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+    const videos = Array.from(document.querySelectorAll<HTMLVideoElement>('[data-hero-video]'));
+    if (videos.length === 0) return;
+    // Under reduced motion, leave the poster frame and never autoplay.
+    if (reduce) return;
+
+    // Play only while in view; pause when scrolled away to save battery/CPU.
+    const io = new IntersectionObserver(
+      (entries) => {
+        for (const entry of entries) {
+          const v = entry.target as HTMLVideoElement;
+          if (entry.isIntersecting) {
+            v.play().catch(() => {
+              /* autoplay may be blocked — poster stays visible, no error */
+            });
+          } else {
+            v.pause();
+          }
+        }
+      },
+      { threshold: 0.25 }
+    );
+    videos.forEach((v) => io.observe(v));
+  }
+
   function init() {
     initReveal();
     initParallax();
+    initHeroVideo();
   }
 
   // Initial load + after each client-side View Transition navigation.

@@ -152,6 +152,16 @@ img, picture, video {
   100% { background-position: -200% 0; }
 }
 
+/* Hero scroll cue: gentle downward bounce (transform only, GPU-composited). */
+@keyframes bounce-down {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(6px); }
+}
+.scroll-cue {
+  animation: bounce-down 1.8s var(--ease-out-soft) infinite;
+  will-change: transform;
+}
+
 /* --- Holographic foil for premium album cards ---
    Static holographic tint + a sheen bar that travels using transform only
    (GPU-composited). No layout properties animated. */
@@ -185,6 +195,7 @@ img, picture, video {
 }
 @media (prefers-reduced-motion: reduce) {
   .foil-sheen { animation: none; opacity: 0.25; }
+  .scroll-cue { animation: none; }
 }
 
 /* =============================================================

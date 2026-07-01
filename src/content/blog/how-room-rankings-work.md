@@ -1,7 +1,9 @@
 ---
-title: "How Room Rankings Work on xLugar"
-description: "Why some rooms appear first, how often the catalog updates, and what the live viewer count really tells you."
+title: "How Live Cam Rankings Work: Viewer Counts Explained"
+description: "Why some cam rooms appear first, how often live listings update, and what the viewer count really tells you about a room before you click."
 pubDate: 2026-06-15
+tags: ["how-to", "rankings"]
+relatedCategories: ["colombian", "milf", "couples"]
 ---
 
 One question we get a lot: why does the catalog order change every time you look at it? The short answer is that rankings follow live audience, and the audience is always moving. Here's the longer version.

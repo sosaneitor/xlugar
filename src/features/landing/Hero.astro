@@ -17,48 +17,88 @@ import { buildRetentionLink } from '@features/affiliate/utils/whiteLabel';
     ></div>
   </div>
 
-  <div class="mx-auto flex max-w-6xl flex-col items-center px-5 pb-12 pt-24 text-center sm:px-8 sm:pt-32">
-    <div data-reveal>
-      <Badge variant="premium" size="md">Live cams · 18+</Badge>
-    </div>
+  <div class="mx-auto grid max-w-6xl items-center gap-10 px-5 pb-20 pt-20 sm:px-8 sm:pt-28 lg:grid-cols-2 lg:gap-12 lg:pb-28">
+    {/* Text column */}
+    <div class="flex flex-col items-center text-center lg:items-start lg:text-left">
+      <div data-reveal>
+        <Badge variant="premium" size="md">Live cams · 18+</Badge>
+      </div>
 
-    <h1
-      id="hero-title"
-      class="mt-6 max-w-3xl text-balance text-5xl leading-[1.04] text-fg sm:text-6xl md:text-7xl"
-      data-reveal
-      style="--reveal-delay: 60ms"
-      transition:name="hero-title"
-    >
-      Thousands of models,
-      <span class="bg-clip-text text-transparent [background-image:var(--gradient-brand)]">
-        live right now.
-      </span>
-    </h1>
-
-    <p
-      class="mt-6 max-w-xl text-lg text-fg-muted"
-      data-reveal
-      style="--reveal-delay: 120ms"
-    >
-      A real-time catalog of live cam models, ranked by who's drawing the biggest crowd this minute and
-      refreshed continuously. Free to watch — find your room in seconds.
-    </p>
-
-    <div data-reveal style="--reveal-delay: 150ms">
-      <LiveCount client:visible />
-    </div>
-
-    <div class="mt-9 flex flex-wrap items-center justify-center gap-4" data-reveal style="--reveal-delay: 180ms">
-      <Button
-        href={buildRetentionLink('home')}
-        variant="gradient"
-        size="lg"
-        rel="sponsored noopener noreferrer"
-        target="_blank"
+      <h1
+        id="hero-title"
+        class="mt-6 max-w-3xl text-balance text-5xl leading-[1.04] text-fg sm:text-6xl md:text-7xl"
+        data-reveal
+        style="--reveal-delay: 60ms"
+        transition:name="hero-title"
       >
-        Enter live cams
-      </Button>
-      <Button href="/models" variant="ghost" size="lg">Browse the catalog</Button>
+        Thousands of models,
+        <span class="bg-clip-text text-transparent [background-image:var(--gradient-brand)]">
+          live right now.
+        </span>
+      </h1>
+
+      <p
+        class="mt-6 max-w-xl text-lg text-fg-muted"
+        data-reveal
+        style="--reveal-delay: 120ms"
+      >
+        A real-time catalog of live cam models, ranked by who's drawing the biggest crowd this minute and
+        refreshed continuously. Free to watch — find your room in seconds.
+      </p>
+
+      <div data-reveal style="--reveal-delay: 150ms">
+        <LiveCount client:visible />
+      </div>
+
+      <div class="mt-9 flex flex-wrap items-center justify-center gap-4 lg:justify-start" data-reveal style="--reveal-delay: 180ms">
+        <Button
+          href={buildRetentionLink('home')}
+          variant="gradient"
+          size="lg"
+          rel="sponsored noopener noreferrer"
+          target="_blank"
+        >
+          Enter live cams
+        </Button>
+        <Button href="/models" variant="ghost" size="lg">Browse the catalog</Button>
+      </div>
+    </div>
+
+    {/* Model column — looping 3D render. Video on top on mobile, right on desktop.
+        The wrapper reserves space (aspect ratio -> no CLS) and its brand gradient
+        doubles as the placeholder until the video/poster assets are in place. */}
+    <div class="order-first lg:order-last" data-reveal style="--reveal-delay: 100ms">
+      <div
+        class="relative mx-auto aspect-[3/4] w-full max-w-sm max-h-[55vh] overflow-hidden rounded-(--radius-lg)
+               border border-border [background-image:var(--gradient-brand)] lg:max-h-none"
+      >
+        {/* Soft inner vignette for legibility/depth over the render */}
+        <div class="pointer-events-none absolute inset-0 z-10 bg-gradient-to-t from-bg/70 via-transparent to-transparent"></div>
+        <video
+          data-hero-video
+          poster="/hero/model-poster.webp"
+          muted
+          loop
+          playsinline
+          preload="none"
+          class="h-full w-full object-cover"
+          aria-hidden="true"
+        >
+          <source src="/hero/model.webm" type="video/webm" />
+          <source src="/hero/model.mp4" type="video/mp4" />
+        </video>
+      </div>
     </div>
   </div>
+
+  {/* Scroll cue — invites the user down into the live catalog (#live). */}
+  <a
+    href="#live"
+    aria-label="Scroll to live models"
+    class="scroll-cue absolute bottom-5 left-1/2 z-10 -translate-x-1/2 text-fg-subtle transition-colors hover:text-premium-300"
+  >
+    <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+      <path d="M6 9l6 6 6-6" />
+    </svg>
+  </a>
 </section>
