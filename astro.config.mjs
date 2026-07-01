@@ -13,6 +13,9 @@ const SITE = process.env.PUBLIC_SITE_URL ?? 'https://xlugar.com';
 export default defineConfig({
   site: SITE,
   output: 'static',
+  // Pages are emitted as directories (/models/latina/index.html) and served with
+  // a trailing slash; make that the canonical, enforced form to avoid dup signals.
+  trailingSlash: 'always',
   adapter: netlify(),
   integrations: [
     react(),

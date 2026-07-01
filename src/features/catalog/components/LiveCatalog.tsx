@@ -26,11 +26,40 @@ const selectClass =
   'rounded-(--radius-md) border border-border-strong bg-surface px-3 py-2 text-sm text-fg ' +
   'focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-premium-400';
 
+// Only surface follower counts once they read as a real popularity signal.
+const FOLLOWERS_BADGE_FLOOR = 10_000;
+
+/** Compact number: 12300 -> "12.3k", 1_200_000 -> "1.2M". */
+function formatCompact(n: number): string {
+  if (n >= 1_000_000) return `${(n / 1_000_000).toFixed(1).replace(/\.0$/, '')}M`;
+  if (n >= 1_000) return `${(n / 1_000).toFixed(1).replace(/\.0$/, '')}k`;
+  return String(n);
+}
+
+/** Seconds online -> "live 2h" / "live 45m"; empty when unknown/too short. */
+function formatUptime(seconds: number): string {
+  if (!seconds || seconds < 60) return '';
+  const hours = Math.floor(seconds / 3600);
+  if (hours >= 1) return `live ${hours}h`;
+  return `live ${Math.floor(seconds / 60)}m`;
+}
+
+/** First spoken language from the comma-separated list, e.g. "English". */
+function primaryLanguage(spoken: string): string {
+  return spoken.split(',')[0]?.trim() ?? '';
+}
+
 function RoomCard({ room, cacheBust }: { room: ChaturbateRoom; cacheBust: number }) {
   const src = room.image_url_360x270 || room.image_url;
   const img = src ? `${src}${src.includes('?') ? '&' : '?'}t=${cacheBust}` : '';
   const tags = room.tags.slice(0, 3);
   const place = room.location || room.country;
+  // Secondary metadata row — fields the feed already delivers but weren't shown.
+  const uptime = formatUptime(room.seconds_online);
+  const language = primaryLanguage(room.spoken_languages);
+  const followers =
+    room.num_followers >= FOLLOWERS_BADGE_FLOOR ? formatCompact(room.num_followers) : '';
+  const meta = [uptime, language, followers && `${followers} followers`].filter(Boolean);
   // Route through the White Label room when configured; else the API revshare link.
   const href = buildRoomLink(room.username, room.chat_room_url_revshare, 'catalog');
   return (
@@ -94,6 +123,9 @@ function RoomCard({ room, cacheBust }: { room: ChaturbateRoom; cacheBust: number
               {place && tags.length > 0 && <span> · </span>}
               {tags.map((t) => `#${t}`).join(' ')}
             </p>
+          )}
+          {meta.length > 0 && (
+            <p className="mt-1 truncate text-xs text-fg-subtle">{meta.join(' · ')}</p>
           )}
         </div>
       </a>

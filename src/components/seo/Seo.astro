@@ -1,5 +1,5 @@
 ---
-import { SITE, absoluteUrl } from '@lib/site';
+import { SITE, absoluteUrl, withTrailingSlash } from '@lib/site';
 
 interface Props {
   title: string;
@@ -25,9 +25,11 @@ const {
   noindex = false,
 } = Astro.props;
 
+// Normalize to the trailing-slash form the static build actually serves
+// (build.format: 'directory'), so canonical never disagrees with the served URL.
 const canonicalUrl = canonical
-  ? absoluteUrl(canonical)
-  : new URL(Astro.url.pathname, SITE.url).href;
+  ? absoluteUrl(withTrailingSlash(canonical))
+  : new URL(withTrailingSlash(Astro.url.pathname), SITE.url).href;
 const fullTitle = rawTitle ? title : `${title} — ${SITE.name}`;
 const imageUrl = absoluteUrl(image);
 ---

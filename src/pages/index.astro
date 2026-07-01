@@ -9,13 +9,20 @@ import Button from '@components/ui/Button.astro';
 import LiveCatalog from '@features/catalog/components/LiveCatalog.tsx';
 import { FEATURED_CATEGORIES } from '@features/catalog/data/categories';
 import { buildRetentionLink } from '@features/affiliate/utils/whiteLabel';
+import { itemListSchema } from '@lib/schema';
 import { SITE } from '@lib/site';
+
+const categoryList = itemListSchema(
+  FEATURED_CATEGORIES.map((c) => ({ name: c.label, path: `/models/${c.slug}` })),
+  'Featured cam categories',
+);
 ---
 <BaseLayout
   title={`${SITE.name} — Live Cam Models Online Now`}
   rawTitle
   description={SITE.defaultDescription}
   type="website"
+  schemas={[categoryList]}
 >
   <SiteHeader slot="header" />
 

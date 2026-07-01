@@ -1,6 +1,7 @@
 ---
 import Button from '@components/ui/Button.astro';
 import Badge from '@components/ui/Badge.astro';
+import LiveCount from '@features/catalog/components/LiveCount.tsx';
 import { buildRetentionLink } from '@features/affiliate/utils/whiteLabel';
 ---
 <section class="relative isolate overflow-hidden" aria-labelledby="hero-title">
@@ -42,6 +43,10 @@ import { buildRetentionLink } from '@features/affiliate/utils/whiteLabel';
       A real-time catalog of live cam models, ranked by who's drawing the biggest crowd this minute and
       refreshed continuously. Free to watch — find your room in seconds.
     </p>
+
+    <div data-reveal style="--reveal-delay: 150ms">
+      <LiveCount client:visible />
+    </div>
 
     <div class="mt-9 flex flex-wrap items-center justify-center gap-4" data-reveal style="--reveal-delay: 180ms">
       <Button
