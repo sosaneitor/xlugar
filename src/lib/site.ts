@@ -13,6 +13,18 @@ export const SITE = {
   defaultOgImage: '/og/default.jpg',
 } as const;
 
+/**
+ * Ensure a path ends with a trailing slash, matching how the static build
+ * serves pages (build.format: 'directory' -> /models/latina/). Leaves the root,
+ * query/hash URLs, and file paths with an extension (e.g. .png) untouched.
+ */
+export function withTrailingSlash(path: string): string {
+  if (path.endsWith('/')) return path;
+  const [base] = path.split(/[?#]/);
+  if (/\.[a-z0-9]+$/i.test(base)) return path; // has a file extension
+  return `${path}/`;
+}
+
 /** Build an absolute URL from a path or relative URL against the site origin. */
 export function absoluteUrl(path: string): string {
   if (/^https?:\/\//i.test(path)) return path;

@@ -17,6 +17,9 @@ export default defineConfig({
   // only match `/api/rooms/`, breaking the client `fetch('/api/rooms')` (catalog +
   // live counter). Canonical consistency is handled in Seo.astro/schema instead,
   // and the default 'ignore' serves both slash forms.
+  // Pages are emitted as directories (/models/latina/index.html) and served with
+  // a trailing slash; make that the canonical, enforced form to avoid dup signals.
+  trailingSlash: 'always',
   adapter: netlify(),
   integrations: [
     react(),

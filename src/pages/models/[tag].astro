@@ -6,7 +6,7 @@ import Section from '@components/ui/Section.astro';
 import LiveCatalog from '@features/catalog/components/LiveCatalog.tsx';
 import AdSlot from '@features/ads/components/AdSlot.astro';
 import { CATEGORIES, getCategoryBySlug } from '@features/catalog/data/categories';
-import { breadcrumbSchema } from '@lib/schema';
+import { breadcrumbSchema, collectionPageSchema } from '@lib/schema';
 
 export function getStaticPaths() {
   return CATEGORIES.map((c) => ({ params: { tag: c.slug } }));
@@ -23,6 +23,11 @@ const breadcrumbs = breadcrumbSchema([
   { name: 'Models', path: '/models' },
   { name: category.label, path: `/models/${category.slug}` },
 ]);
+const collection = collectionPageSchema({
+  name: category.h1,
+  description: category.description,
+  path: `/models/${category.slug}`,
+});
 
 const related = CATEGORIES.filter((c) => c.slug !== category.slug);
 ---
@@ -30,7 +35,8 @@ const related = CATEGORIES.filter((c) => c.slug !== category.slug);
   title={category.title}
   description={category.description}
   canonical={`/models/${category.slug}`}
-  schemas={[breadcrumbs]}
+  image={`/og/models/${category.slug}.png`}
+  schemas={[breadcrumbs, collection]}
 >
   <SiteHeader slot="header" />
 

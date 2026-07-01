@@ -16,6 +16,7 @@
     "@astrojs/sitemap": "^3.6.0",
     "@tailwindcss/vite": "^4.1.16",
     "astro": "^5.16.0",
+    "astro-og-canvas": "^0.13.0",
     "react": "^19.2.0",
     "react-dom": "^19.2.0",
     "tailwindcss": "^4.1.16"
