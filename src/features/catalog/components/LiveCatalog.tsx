@@ -235,7 +235,7 @@ export default function LiveCatalog({ initialTag, pageSize = 24, adEvery = 12 }:
 
       {/* States */}
       {status === 'loading' && (
-        <ul className="mt-8 grid grid-cols-2 gap-4 sm:grid-cols-3 sm:gap-5 lg:grid-cols-4" aria-hidden="true">
+        <ul className="mt-8 grid grid-cols-1 gap-4 sm:grid-cols-2 sm:gap-5 md:grid-cols-3 lg:grid-cols-4" aria-hidden="true">
           {Array.from({ length: pageSize > 12 ? 12 : pageSize }).map((_, i) => (
             <li
               key={i}
@@ -271,7 +271,7 @@ export default function LiveCatalog({ initialTag, pageSize = 24, adEvery = 12 }:
 
       {status === 'ready' && filtered.length > 0 && (
         <>
-          <ul className="mt-8 grid grid-cols-2 gap-4 sm:grid-cols-3 sm:gap-5 lg:grid-cols-4">
+          <ul className="mt-8 grid grid-cols-1 gap-4 sm:grid-cols-2 sm:gap-5 md:grid-cols-3 lg:grid-cols-4">
             {pageItems.map((room, i) => {
               const cards = [<RoomCard key={room.username} room={room} cacheBust={lastUpdated} />];
               // In-grid ad placeholder every `adEvery` cards.
