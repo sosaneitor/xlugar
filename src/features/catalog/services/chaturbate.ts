@@ -20,14 +20,56 @@ export type Region =
   | 'africa'
   | 'other';
 
+const REGIONS: Region[] = [
+  'northamerica',
+  'southamerica',
+  'europe_russia',
+  'asia',
+  'africa',
+  'other',
+];
+
+/** How to order the returned pool. */
+export type SortMode = 'viewers' | 'new';
+
+// --- Catalog tuning from env (see docs/chaturbate-api.md). ---
+/** Default region for the whole grid; undefined = global. */
+export const DEFAULT_REGION: Region | undefined = (() => {
+  const raw = (import.meta.env.PUBLIC_DEFAULT_REGION ?? '').trim() as Region;
+  return REGIONS.includes(raw) ? raw : undefined;
+})();
+
+/** ISO alpha-2 code ranked first in the grid (e.g. "CO"). */
+export const PRIORITY_COUNTRY = (import.meta.env.PUBLIC_PRIORITY_COUNTRY ?? '')
+  .trim()
+  .toUpperCase();
+
+/** Pool size to request from CB. Verified safe well above 90. */
+export const DEFAULT_LIMIT = (() => {
+  const n = Number(import.meta.env.PUBLIC_ROOMS_LIMIT);
+  return Number.isFinite(n) && n > 0 ? Math.min(n, 500) : 300;
+})();
+
+/** Tags that signal Colombian/LatAm rooms, used as a ranking tiebreaker. */
+const LATAM_TAGS = new Set(['colombian', 'colombiana', 'latina', 'latino', 'latin']);
+
 export interface FetchRoomsOptions {
-  /** Max rooms to request from the API. */
+  /** Max rooms to request from the API. Defaults to DEFAULT_LIMIT. */
   limit?: number;
   /** Restrict to a single tag (case-insensitive). */
   tag?: string;
   gender?: Gender;
-  /** Optional geo region filter (server-side, documented param). */
-  region?: Region;
+  /** Restrict to an ISO alpha-2 country code (e.g. "CO"). */
+  country?: string;
+  /** Substring match against spoken_languages (e.g. "spanish"). */
+  language?: string;
+  /**
+   * Optional geo region filter (server-side, documented param). When omitted
+   * the env DEFAULT_REGION is applied; pass `null` to force a global pool.
+   */
+  region?: Region | null;
+  /** Ordering of the returned list. Defaults to 'viewers'. */
+  sort?: SortMode;
   /**
    * End-user IP for geo-targeting/compliance. The API REQUIRES this param.
    * Pass the real visitor IP, or the literal 'request_ip' to let Chaturbate
@@ -52,6 +94,9 @@ function normalizeRoom(raw: unknown): ChaturbateRoom | null {
     : 'f';
   return {
     username: r.username,
+    display_name:
+      typeof r.display_name === 'string' && r.display_name ? r.display_name : undefined,
+    slug: typeof r.slug === 'string' && r.slug ? r.slug : undefined,
     current_show: (r.current_show as ChaturbateRoom['current_show']) ?? 'public',
     num_users: typeof r.num_users === 'number' ? r.num_users : 0,
     num_followers: typeof r.num_followers === 'number' ? r.num_followers : 0,
@@ -82,9 +127,11 @@ export function applyFilters(
   filters: RoomFilters,
 ): ChaturbateRoom[] {
   const tag = filters.tag?.toLowerCase();
+  const country = filters.country?.toUpperCase();
   const lang = filters.language?.toLowerCase();
   return rooms.filter((room) => {
     if (tag && !room.tags.some((t) => t.toLowerCase() === tag)) return false;
+    if (country && room.country?.toUpperCase() !== country) return false;
     if (filters.gender && room.gender !== filters.gender) return false;
     if (lang && !room.spoken_languages.toLowerCase().includes(lang)) return false;
     if (filters.minViewers && room.num_users < filters.minViewers) return false;
@@ -92,18 +139,58 @@ export function applyFilters(
   });
 }
 
+/** A room counts as LatAm-relevant via its tags. */
+function hasLatamTag(room: ChaturbateRoom): boolean {
+  return room.tags.some((t) => LATAM_TAGS.has(t.toLowerCase()));
+}
+
+/**
+ * Rank rooms so the priority audience floats to the top:
+ *   1. Rooms in PRIORITY_COUNTRY (e.g. Colombia).
+ *   2. Rooms that speak Spanish or carry a LatAm tag.
+ *   3. Everything else.
+ * Within each tier, order by `sort` (viewers desc, or newest online first).
+ */
+export function rankRooms(
+  rooms: ChaturbateRoom[],
+  { priorityCountry = PRIORITY_COUNTRY, sort = 'viewers' as SortMode } = {},
+): ChaturbateRoom[] {
+  const tier = (r: ChaturbateRoom): number => {
+    if (priorityCountry && r.country?.toUpperCase() === priorityCountry) return 0;
+    if (r.spoken_languages.toLowerCase().includes('spanish') || hasLatamTag(r)) return 1;
+    return 2;
+  };
+  const within = (a: ChaturbateRoom, b: ChaturbateRoom): number =>
+    sort === 'new'
+      ? a.seconds_online - b.seconds_online // freshest (least time online) first
+      : b.num_users - a.num_users;
+  return [...rooms].sort((a, b) => tier(a) - tier(b) || within(a, b));
+}
+
 /**
  * Fetch online rooms from the Chaturbate affiliates API.
  *  - Filters to `current_show === "public"`.
- *  - Sorts by `num_users` descending.
- *  - Optionally narrows by tag/gender server-side.
+ *  - Sends `region`/`gender` server-side (bigger, more relevant pool).
+ *  - Ranks Colombia/LatAm first, then by `sort` (viewers | new).
  *
  * Throws on a non-OK response so callers (the proxy / build) can surface it.
  */
 export async function fetchRooms(
   options: FetchRoomsOptions = {},
 ): Promise<ChaturbateRoom[]> {
-  const { limit = 90, tag, gender, region, clientIp = 'request_ip', signal } = options;
+  const {
+    limit = DEFAULT_LIMIT,
+    tag,
+    gender,
+    country,
+    language,
+    region,
+    sort = 'viewers',
+    clientIp = 'request_ip',
+    signal,
+  } = options;
+  // `undefined` → fall back to env default; `null` → explicit global pool.
+  const effectiveRegion = region === undefined ? DEFAULT_REGION : region;
 
   // Without a campaign (wm) the API rejects the request — fail loud and clear.
   if (!CAMPAIGN) {
@@ -120,7 +207,9 @@ export async function fetchRooms(
   // REQUIRED by the API. 'request_ip' tells CB to use the requester's IP;
   // the proxy overrides this with the real visitor IP when available.
   url.searchParams.set('client_ip', clientIp);
-  if (region) url.searchParams.set('region', region);
+  if (effectiveRegion) url.searchParams.set('region', effectiveRegion);
+  // Server-side gender filter — a fuller pool than filtering a global top-N.
+  if (gender) url.searchParams.set('gender', gender);
 
   const res = await fetch(url.href, {
     signal,
@@ -147,6 +236,8 @@ export async function fetchRooms(
     .filter((r): r is ChaturbateRoom => r !== null)
     .filter((r) => r.current_show === 'public');
 
-  const filtered = applyFilters(rooms, { tag, gender });
-  return filtered.sort((a, b) => b.num_users - a.num_users);
+  // `gender` is also kept here as a fallback in case the API ignores the param.
+  // `tag`/`country`/`language` are not API params, so they filter here.
+  const filtered = applyFilters(rooms, { tag, gender, country, language });
+  return rankRooms(filtered, { sort });
 }

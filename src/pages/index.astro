@@ -7,6 +7,7 @@ import Section from '@components/ui/Section.astro';
 import SectionHeading from '@components/ui/SectionHeading.astro';
 import Button from '@components/ui/Button.astro';
 import LiveCatalog from '@features/catalog/components/LiveCatalog.tsx';
+import FeaturedRooms from '@features/catalog/components/FeaturedRooms.tsx';
 import { FEATURED_CATEGORIES } from '@features/catalog/data/categories';
 import { buildRetentionLink } from '@features/affiliate/utils/whiteLabel';
 import { itemListSchema } from '@lib/schema';
@@ -27,6 +28,21 @@ const categoryList = itemListSchema(
   <SiteHeader slot="header" />
 
   <Hero />
+
+  {/* Colombianas / LatAm live — the priority audience, ranked first */}
+  <Section id="colombianas" labelledby="colombianas-title">
+    <SectionHeading eyebrow="En vivo ahora" eyebrowVariant="premium" title="Colombianas en vivo" id="colombianas-title">
+      <p class="text-fg-muted">
+        Modelos de Colombia y Latinoamérica transmitiendo en este momento, ordenadas por audiencia en vivo.
+      </p>
+    </SectionHeading>
+    <div class="mt-10">
+      <FeaturedRooms client:visible region="southamerica" country="CO" gender="f" count={8} />
+    </div>
+    <div class="mt-10 flex justify-center">
+      <Button href="/models/colombian" variant="gradient" size="lg">Ver todas las colombianas</Button>
+    </div>
+  </Section>
 
   {/* Live models — top rooms by current viewers */}
   <Section id="live" labelledby="live-title" class="bg-bg-elev">

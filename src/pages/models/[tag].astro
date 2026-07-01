@@ -53,7 +53,16 @@ const related = CATEGORIES.filter((c) => c.slug !== category.slug);
 
     <div class="mt-10 grid gap-8 lg:grid-cols-[1fr_300px]">
       <div>
-        <LiveCatalog client:visible initialTag={category.tag} pageSize={24} adEvery={12} />
+        <LiveCatalog
+          client:visible
+          initialTag={category.tag}
+          initialCountry={category.country}
+          initialLanguage={category.language}
+          initialGender={category.gender}
+          initialRegion={category.region}
+          pageSize={24}
+          adEvery={12}
+        />
       </div>
       <aside class="hidden lg:block">
         <div class="sticky top-24">

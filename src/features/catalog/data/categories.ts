@@ -3,14 +3,28 @@
  * /models/[slug] whose unique h1/title/description/intro are the indexable
  * content; the live room grid for the category hydrates client-side.
  *
- * `tag` is the Chaturbate API tag we filter the live grid by.
+ * A category narrows the live grid by one or more of: `tag`, `country`,
+ * `language`, `region`. IMPORTANT: models rarely self-apply nationality tags
+ * (e.g. almost none tag "colombian"), so nationality categories filter by
+ * `country` (ISO code) and/or `region` instead — see docs/chaturbate-api.md.
  * `slug` is the URL segment (kept English, Tier-1 friendly).
  * Copy is unique, real English — no lorem, no duplication across entries.
  */
 
+import type { Region } from '../services/chaturbate';
+import type { Gender } from '../types/room';
+
 export interface Category {
-  /** API tag to filter rooms by (case-insensitive). */
-  tag: string;
+  /** API tag to filter rooms by (case-insensitive). Omit for geo/lang categories. */
+  tag?: string;
+  /** ISO alpha-2 country code to require (e.g. "CO"). */
+  country?: string;
+  /** spoken_languages substring to require (e.g. "Spanish"). */
+  language?: string;
+  /** Server-side gender filter (e.g. "c" for couples). */
+  gender?: Gender;
+  /** Region pool to pull from. Defaults to the env default (southamerica). */
+  region?: Region | 'all';
   /** URL segment under /models/. */
   slug: string;
   /** Short label for nav/chips. */
@@ -30,6 +44,7 @@ export interface Category {
 export const CATEGORIES: Category[] = [
   {
     tag: 'latina',
+    region: 'southamerica',
     slug: 'latina',
     label: 'Latina',
     h1: 'Latina Cams — Live Latina Models Online Now',
@@ -41,7 +56,9 @@ export const CATEGORIES: Category[] = [
     featured: true,
   },
   {
-    tag: 'colombian',
+    // Models almost never self-tag "colombian" — filter by country instead.
+    country: 'CO',
+    region: 'southamerica',
     slug: 'colombian',
     label: 'Colombian',
     h1: 'Colombian Cams — Live Models from Colombia',
@@ -53,7 +70,10 @@ export const CATEGORIES: Category[] = [
     featured: true,
   },
   {
-    tag: 'spanish',
+    // "spanish" is a language, not a common tag — filter by spoken_languages.
+    // Value matches a LiveCatalog language option so the dropdown reflects it.
+    language: 'Spanish',
+    region: 'southamerica',
     slug: 'spanish',
     label: 'Spanish Speaking',
     h1: 'Spanish-Speaking Cams — Live Models Online',
@@ -66,6 +86,7 @@ export const CATEGORIES: Category[] = [
   },
   {
     tag: 'asian',
+    region: 'asia',
     slug: 'asian',
     label: 'Asian',
     h1: 'Asian Cams — Live Asian Models Online Now',
@@ -137,7 +158,8 @@ export const CATEGORIES: Category[] = [
     featured: false,
   },
   {
-    tag: 'couple',
+    // Couples rarely use the "couple" tag reliably — filter by gender instead.
+    gender: 'c',
     slug: 'couples',
     label: 'Couples',
     h1: 'Couples Cams — Live Couples Online Now',

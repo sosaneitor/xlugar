@@ -1,6 +1,6 @@
 import type { APIRoute } from 'astro';
 import { fetchRooms } from '@features/catalog/services/chaturbate';
-import type { Region } from '@features/catalog/services/chaturbate';
+import type { Region, SortMode } from '@features/catalog/services/chaturbate';
 import type { Gender } from '@features/catalog/types/room';
 
 // On-demand serverless route (Netlify function). Opts this single endpoint out
@@ -38,16 +38,26 @@ function resolveClientIp(request: Request, clientAddress: string | undefined): s
 
 export const GET: APIRoute = async ({ url, request, clientAddress }) => {
   const tag = url.searchParams.get('tag') ?? undefined;
+  const country = url.searchParams.get('country') ?? undefined;
+  const language = url.searchParams.get('language') ?? undefined;
   const genderParam = url.searchParams.get('gender');
   const gender = genderParam && VALID_GENDERS.includes(genderParam as Gender)
     ? (genderParam as Gender)
     : undefined;
+  // region: a valid code narrows the pool; 'all'/'global' forces a GLOBAL pool
+  // (null overrides the env default); anything else → undefined → env default.
   const regionParam = url.searchParams.get('region');
-  const region = regionParam && VALID_REGIONS.includes(regionParam as Region)
-    ? (regionParam as Region)
-    : undefined;
+  const region: Region | null | undefined =
+    regionParam === 'all' || regionParam === 'global'
+      ? null
+      : regionParam && VALID_REGIONS.includes(regionParam as Region)
+        ? (regionParam as Region)
+        : undefined;
+  const sortParam = url.searchParams.get('sort');
+  const sort: SortMode = sortParam === 'new' ? 'new' : 'viewers';
   const limitParam = Number(url.searchParams.get('limit'));
-  const limit = Number.isFinite(limitParam) && limitParam > 0 ? Math.min(limitParam, 90) : 90;
+  const limit =
+    Number.isFinite(limitParam) && limitParam > 0 ? Math.min(limitParam, 500) : undefined;
 
   let clientIp = 'request_ip';
   try {
@@ -57,7 +67,7 @@ export const GET: APIRoute = async ({ url, request, clientAddress }) => {
   }
 
   try {
-    const rooms = await fetchRooms({ tag, gender, region, limit, clientIp });
+    const rooms = await fetchRooms({ tag, gender, country, language, region, sort, limit, clientIp });
     return new Response(JSON.stringify({ rooms, count: rooms.length }), {
       status: 200,
       headers: {

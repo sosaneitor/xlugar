@@ -1,11 +1,22 @@
 import { useMemo, useState } from 'react';
 import { useRooms } from '../hooks/useRooms';
+import { DEFAULT_REGION } from '../services/chaturbate';
+import type { Region, SortMode } from '../services/chaturbate';
 import { buildRoomLink } from '@features/affiliate/utils/whiteLabel';
+import { countryToFlag, countryName } from '../utils/country';
 import type { ChaturbateRoom, Gender } from '../types/room';
 
 interface LiveCatalogProps {
-  /** Lock to a category tag (category pages). When set, the tag filter is hidden. */
+  /** Lock to a category tag (category pages). */
   initialTag?: string;
+  /** Lock to an ISO alpha-2 country (e.g. "CO") — for nationality categories. */
+  initialCountry?: string;
+  /** Seed the language filter (e.g. "Spanish"). */
+  initialLanguage?: string;
+  /** Seed the active gender tab (e.g. "c" for couples). */
+  initialGender?: Gender | '';
+  /** Seed the active region tab. Defaults to the env default. */
+  initialRegion?: Region | 'all';
   /** Cards per page. */
   pageSize?: number;
   /** Insert an ad placeholder every N cards. */
@@ -20,11 +31,29 @@ const GENDERS: { value: Gender | ''; label: string }[] = [
   { value: 'c', label: 'Couples' },
   { value: 't', label: 'Trans' },
 ];
+// Server-side region tabs (each change re-fetches a fresh pool from CB).
+const REGION_TABS: { value: Region | 'all'; label: string }[] = [
+  { value: 'southamerica', label: 'LatAm' },
+  { value: 'northamerica', label: 'N. America' },
+  { value: 'europe_russia', label: 'Europe' },
+  { value: 'asia', label: 'Asia' },
+  { value: 'all', label: 'Global' },
+];
+const SORTS: { value: SortMode; label: string }[] = [
+  { value: 'viewers', label: 'Most viewers' },
+  { value: 'new', label: 'Newest live' },
+];
 const VIEWER_FLOORS = [0, 50, 100, 500, 1000];
 
 const selectClass =
   'rounded-(--radius-md) border border-border-strong bg-surface px-3 py-2 text-sm text-fg ' +
   'focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-premium-400';
+
+const tabBase =
+  'rounded-(--radius-pill) border px-3.5 py-1.5 text-sm transition-colors duration-(--dur-fast) ' +
+  'focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-premium-400';
+const tabActive = 'border-premium-500 bg-premium-500/10 text-premium-200';
+const tabIdle = 'border-border-strong bg-surface text-fg-muted hover:border-premium-500 hover:text-premium-300';
 
 // Only surface follower counts once they read as a real popularity signal.
 const FOLLOWERS_BADGE_FLOOR = 10_000;
@@ -49,11 +78,15 @@ function primaryLanguage(spoken: string): string {
   return spoken.split(',')[0]?.trim() ?? '';
 }
 
-function RoomCard({ room, cacheBust }: { room: ChaturbateRoom; cacheBust: number }) {
+export function RoomCard({ room, cacheBust }: { room: ChaturbateRoom; cacheBust: number }) {
   const src = room.image_url_360x270 || room.image_url;
   const img = src ? `${src}${src.includes('?') ? '&' : '?'}t=${cacheBust}` : '';
   const tags = room.tags.slice(0, 3);
-  const place = room.location || room.country;
+  const flag = countryToFlag(room.country);
+  // Prefer the model's own free-text location; else the resolved country name.
+  const place = room.location || countryName(room.country);
+  const title = room.display_name || room.username;
+  const subject = room.room_subject?.trim();
   // Secondary metadata row — fields the feed already delivers but weren't shown.
   const uptime = formatUptime(room.seconds_online);
   const language = primaryLanguage(room.spoken_languages);
@@ -112,11 +145,17 @@ function RoomCard({ room, cacheBust }: { room: ChaturbateRoom; cacheBust: number
         </div>
         <div className="absolute inset-x-0 bottom-0 p-4">
           <h3 className="text-lg text-fg">
-            {room.username}
+            {flag && <span className="mr-1" aria-hidden="true">{flag}</span>}
+            {title}
             {room.age ? (
               <span className="font-sans text-base font-normal text-fg-muted">, {room.age}</span>
             ) : null}
           </h3>
+          {subject && (
+            <p className="mt-0.5 truncate text-sm text-fg" title={subject}>
+              {subject}
+            </p>
+          )}
           {(place || tags.length > 0) && (
             <p className="mt-0.5 truncate text-sm text-fg-muted">
               {place && <span>{place}</span>}
@@ -146,30 +185,54 @@ function AdCard() {
   );
 }
 
-export default function LiveCatalog({ initialTag, pageSize = 24, adEvery = 12 }: LiveCatalogProps) {
-  const { rooms, status, lastUpdated, refresh } = useRooms({ tag: initialTag });
-  const [language, setLanguage] = useState('');
-  const [gender, setGender] = useState<Gender | ''>('');
+export default function LiveCatalog({
+  initialTag,
+  initialCountry,
+  initialLanguage,
+  initialGender,
+  initialRegion,
+  pageSize = 24,
+  adEvery = 12,
+}: LiveCatalogProps) {
+  // Server-side controls (each change re-fetches a fresh pool from Chaturbate).
+  const [region, setRegion] = useState<Region | 'all'>(
+    initialRegion ?? DEFAULT_REGION ?? 'all',
+  );
+  const [gender, setGender] = useState<Gender | ''>(initialGender ?? '');
+  const [sort, setSort] = useState<SortMode>('viewers');
+  // Client-side filters (applied over the already-loaded pool, no re-fetch).
+  const [language, setLanguage] = useState(initialLanguage ?? '');
   const [minViewers, setMinViewers] = useState(0);
+  const [hdOnly, setHdOnly] = useState(false);
+  const [newOnly, setNewOnly] = useState(false);
   const [page, setPage] = useState(1);
+
+  const { rooms, status, lastUpdated, refresh } = useRooms({
+    tag: initialTag,
+    country: initialCountry,
+    region,
+    gender: gender || undefined,
+    sort,
+  });
 
   // Re-run client-side filters whenever the data or a control changes.
   const filtered = useMemo(() => {
     const lang = language.toLowerCase();
     return rooms.filter((r) => {
       if (lang && !r.spoken_languages.toLowerCase().includes(lang)) return false;
-      if (gender && r.gender !== gender) return false;
       if (minViewers && r.num_users < minViewers) return false;
+      if (hdOnly && !r.is_hd) return false;
+      if (newOnly && !r.is_new) return false;
       return true;
     });
-  }, [rooms, language, gender, minViewers]);
+  }, [rooms, language, minViewers, hdOnly, newOnly]);
 
   const totalPages = Math.max(1, Math.ceil(filtered.length / pageSize));
   const safePage = Math.min(page, totalPages);
   const pageItems = filtered.slice((safePage - 1) * pageSize, safePage * pageSize);
 
-  // Reset to page 1 when filters change the result set out from under us.
-  function onFilterChange<T>(setter: (v: T) => void) {
+  // Reset to page 1 whenever any control changes the result set under us.
+  function change<T>(setter: (v: T) => void) {
     return (v: T) => {
       setter(v);
       setPage(1);
@@ -178,14 +241,58 @@ export default function LiveCatalog({ initialTag, pageSize = 24, adEvery = 12 }:
 
   return (
     <div>
-      {/* Filters */}
-      <div className="flex flex-wrap items-end gap-3" role="group" aria-label="Filter live models">
+      {/* Server-side tabs: region + gender (re-fetch the pool from CB). */}
+      <div className="flex flex-col gap-3">
+        <div className="flex flex-wrap gap-2" role="group" aria-label="Region">
+          {REGION_TABS.map((r) => (
+            <button
+              key={r.value}
+              type="button"
+              aria-pressed={region === r.value}
+              onClick={() => change(setRegion)(r.value)}
+              className={`${tabBase} ${region === r.value ? tabActive : tabIdle}`}
+            >
+              {r.label}
+            </button>
+          ))}
+        </div>
+        <div className="flex flex-wrap gap-2" role="group" aria-label="Showing">
+          {GENDERS.map((g) => (
+            <button
+              key={g.value}
+              type="button"
+              aria-pressed={gender === g.value}
+              onClick={() => change(setGender)(g.value)}
+              className={`${tabBase} ${gender === g.value ? tabActive : tabIdle}`}
+            >
+              {g.label}
+            </button>
+          ))}
+        </div>
+      </div>
+
+      {/* Client-side filters + sort. */}
+      <div className="mt-4 flex flex-wrap items-end gap-3" role="group" aria-label="Filter and sort">
+        <label className="flex flex-col gap-1 text-xs text-fg-subtle">
+          Sort by
+          <select
+            className={selectClass}
+            value={sort}
+            onChange={(e) => change(setSort)(e.target.value as SortMode)}
+          >
+            {SORTS.map((s) => (
+              <option key={s.value} value={s.value}>
+                {s.label}
+              </option>
+            ))}
+          </select>
+        </label>
         <label className="flex flex-col gap-1 text-xs text-fg-subtle">
           Language
           <select
             className={selectClass}
             value={language}
-            onChange={(e) => onFilterChange(setLanguage)(e.target.value)}
+            onChange={(e) => change(setLanguage)(e.target.value)}
           >
             <option value="">Any language</option>
             {LANGUAGES.map((l) => (
@@ -196,25 +303,11 @@ export default function LiveCatalog({ initialTag, pageSize = 24, adEvery = 12 }:
           </select>
         </label>
         <label className="flex flex-col gap-1 text-xs text-fg-subtle">
-          Showing
-          <select
-            className={selectClass}
-            value={gender}
-            onChange={(e) => onFilterChange(setGender)(e.target.value as Gender | '')}
-          >
-            {GENDERS.map((g) => (
-              <option key={g.value} value={g.value}>
-                {g.label}
-              </option>
-            ))}
-          </select>
-        </label>
-        <label className="flex flex-col gap-1 text-xs text-fg-subtle">
           Min viewers
           <select
             className={selectClass}
             value={minViewers}
-            onChange={(e) => onFilterChange(setMinViewers)(Number(e.target.value))}
+            onChange={(e) => change(setMinViewers)(Number(e.target.value))}
           >
             {VIEWER_FLOORS.map((v) => (
               <option key={v} value={v}>
@@ -222,6 +315,24 @@ export default function LiveCatalog({ initialTag, pageSize = 24, adEvery = 12 }:
               </option>
             ))}
           </select>
+        </label>
+        <label className="flex items-center gap-2 text-sm text-fg-muted">
+          <input
+            type="checkbox"
+            checked={hdOnly}
+            onChange={(e) => change(setHdOnly)(e.target.checked)}
+            className="accent-premium-500"
+          />
+          HD only
+        </label>
+        <label className="flex items-center gap-2 text-sm text-fg-muted">
+          <input
+            type="checkbox"
+            checked={newOnly}
+            onChange={(e) => change(setNewOnly)(e.target.checked)}
+            className="accent-premium-500"
+          />
+          New only
         </label>
         <button
           type="button"

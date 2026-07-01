@@ -1,5 +1,6 @@
 import { useCallback, useEffect, useRef, useState } from 'react';
-import type { ChaturbateRoom } from '../types/room';
+import type { ChaturbateRoom, Gender } from '../types/room';
+import type { Region, SortMode } from '../services/chaturbate';
 
 export type RoomsStatus = 'loading' | 'ready' | 'empty' | 'error';
 
@@ -14,6 +15,18 @@ interface UseRoomsResult {
 interface UseRoomsOptions {
   /** Lock the grid to a single API tag (category pages). */
   tag?: string;
+  /** Server-side geo region. 'all' forces a global pool; omit for env default. */
+  region?: Region | 'all';
+  /** Server-side gender filter. */
+  gender?: Gender;
+  /** Require an ISO alpha-2 country code (e.g. "CO"). */
+  country?: string;
+  /** Substring match against spoken_languages (e.g. "spanish"). */
+  language?: string;
+  /** Ordering of the pool. */
+  sort?: SortMode;
+  /** Max rooms to request from the proxy. */
+  limit?: number;
   /** Poll interval in ms. Defaults to 60s per spec. */
   intervalMs?: number;
 }
@@ -23,7 +36,16 @@ interface UseRoomsOptions {
  * The proxy already filters current_show=public and sorts by num_users desc.
  * Cancels the interval and any in-flight request on unmount.
  */
-export function useRooms({ tag, intervalMs = 60_000 }: UseRoomsOptions = {}): UseRoomsResult {
+export function useRooms({
+  tag,
+  region,
+  gender,
+  country,
+  language,
+  sort,
+  limit,
+  intervalMs = 60_000,
+}: UseRoomsOptions = {}): UseRoomsResult {
   const [rooms, setRooms] = useState<ChaturbateRoom[]>([]);
   const [status, setStatus] = useState<RoomsStatus>('loading');
   const [lastUpdated, setLastUpdated] = useState(0);
@@ -36,8 +58,18 @@ export function useRooms({ tag, intervalMs = 60_000 }: UseRoomsOptions = {}): Us
       abortRef.current = controller;
       if (isInitial) setStatus('loading');
       try {
-        const qs = tag ? `?tag=${encodeURIComponent(tag)}` : '';
-        const res = await fetch(`/api/rooms${qs}`, { signal: controller.signal });
+        const params = new URLSearchParams();
+        if (tag) params.set('tag', tag);
+        if (region) params.set('region', region);
+        if (gender) params.set('gender', gender);
+        if (country) params.set('country', country);
+        if (language) params.set('language', language);
+        if (sort) params.set('sort', sort);
+        if (limit) params.set('limit', String(limit));
+        const qs = params.toString();
+        const res = await fetch(`/api/rooms${qs ? `?${qs}` : ''}`, {
+          signal: controller.signal,
+        });
         if (!res.ok) throw new Error(`proxy ${res.status}`);
         const data = (await res.json()) as { rooms?: ChaturbateRoom[] };
         const next = Array.isArray(data.rooms) ? data.rooms : [];
@@ -50,7 +82,7 @@ export function useRooms({ tag, intervalMs = 60_000 }: UseRoomsOptions = {}): Us
         setStatus((prev) => (prev === 'loading' ? 'error' : prev));
       }
     },
-    [tag],
+    [tag, region, gender, country, language, sort, limit],
   );
 
   useEffect(() => {

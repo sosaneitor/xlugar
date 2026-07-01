@@ -12,12 +12,14 @@ export type CurrentShow = 'public' | 'private' | 'group' | 'hidden' | 'away';
 /** A single online room as returned by the affiliates API. */
 export interface ChaturbateRoom {
   username: string;
+  /** Cased display name; falls back to `username` when absent. */
+  display_name?: string;
   current_show: CurrentShow;
   num_users: number;
   num_followers: number;
   gender: Gender;
   location: string;
-  /** ISO-ish country string, sometimes more specific than `location`. */
+  /** ISO alpha-2 country code (uppercase), e.g. "CO", "BR". Empty when unknown. */
   country: string;
   /** Display age; may be absent for some rooms. */
   age?: number;
@@ -38,6 +40,8 @@ export interface ChaturbateRoom {
   chat_room_url_revshare: string;
   /** Non-affiliate room URL (do not use for outbound links). */
   chat_room_url?: string;
+  /** URL slug for the room (usually equals `username`). */
+  slug?: string;
 }
 
 /** Top-level response. The API returns `{ results: [...] }`; tolerate a bare array. */
@@ -46,11 +50,13 @@ export interface OnlineRoomsResponse {
   results: ChaturbateRoom[];
 }
 
-/** Filters applied client-side over the fetched snapshot. */
+/** Filters applied over the fetched snapshot. */
 export interface RoomFilters {
   /** Single tag to require (case-insensitive). */
   tag?: string;
   gender?: Gender;
+  /** ISO alpha-2 country code to require (e.g. "CO"). Case-insensitive. */
+  country?: string;
   /** Substring match against spoken_languages (case-insensitive). */
   language?: string;
   /** Minimum viewer count. */
