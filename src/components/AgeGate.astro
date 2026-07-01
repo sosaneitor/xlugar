@@ -128,6 +128,19 @@ import { SITE } from '@lib/site';
     var KEY = 'xlugar_age_ok';
     var LEAVE_URL = 'https://www.google.com';
 
+    function hasConsent() {
+      try { return !!localStorage.getItem(KEY); } catch (e) { return false; }
+    }
+
+    // Re-apply the confirmed state to <html>. View Transitions swap the <html>
+    // attributes on every client navigation (dropping the class), and the
+    // pre-paint head script only runs on full page loads — so without this the
+    // gate would reappear on each navigation. astro:after-swap fires right after
+    // the DOM swap and BEFORE paint, so re-adding the class here avoids any flash.
+    function applyConsent() {
+      if (hasConsent()) document.documentElement.classList.add('age-ok');
+    }
+
     function reveal() {
       try {
         var payload = JSON.stringify({ v: 1, t: Date.now() });
@@ -140,7 +153,8 @@ import { SITE } from '@lib/site';
     function wire() {
       var gate = document.getElementById('age-gate');
       if (!gate) return;
-      // Lock scroll while the gate is visible.
+      applyConsent();
+      // Lock scroll only while the gate is actually visible (no consent yet).
       if (!document.documentElement.classList.contains('age-ok')) {
         document.body.style.overflow = 'hidden';
       }
@@ -151,6 +165,9 @@ import { SITE } from '@lib/site';
         window.location.href = LEAVE_URL;
       });
     }
+
+    // Persist across View Transitions: re-apply before paint on every swap.
+    document.addEventListener('astro:after-swap', applyConsent);
 
     if (document.readyState === 'loading') {
       document.addEventListener('DOMContentLoaded', wire);
