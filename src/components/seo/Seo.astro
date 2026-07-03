@@ -13,6 +13,11 @@ interface Props {
   /** Suppress " — xLugar" suffix (e.g. for the home page that already brands the title). */
   rawTitle?: boolean;
   noindex?: boolean;
+  /**
+   * Explicit robots directive (e.g. "noindex, follow" for filter/param URLs).
+   * Takes precedence over `noindex`. Omit for the default (index, follow).
+   */
+  robots?: string;
 }
 
 const {
@@ -23,7 +28,12 @@ const {
   type = 'website',
   rawTitle = false,
   noindex = false,
+  robots,
 } = Astro.props;
+
+// Explicit `robots` wins; else `noindex` maps to the common noindex directive;
+// else nothing is emitted (crawlers default to index, follow).
+const robotsContent = robots ?? (noindex ? 'noindex, nofollow' : undefined);
 
 // Normalize to the trailing-slash form the static build actually serves
 // (build.format: 'directory'), so canonical never disagrees with the served URL.
@@ -37,7 +47,7 @@ const imageUrl = absoluteUrl(image);
 <title>{fullTitle}</title>
 <meta name="description" content={description} />
 <link rel="canonical" href={canonicalUrl} />
-{noindex && <meta name="robots" content="noindex, nofollow" />}
+{robotsContent && <meta name="robots" content={robotsContent} />}
 
 {/* Open Graph */}
 <meta property="og:type" content={type} />

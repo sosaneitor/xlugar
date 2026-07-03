@@ -22,6 +22,8 @@ interface Props {
   type?: 'website' | 'profile' | 'article';
   rawTitle?: boolean;
   noindex?: boolean;
+  /** Explicit robots directive (e.g. "noindex, follow"); overrides `noindex`. */
+  robots?: string;
   /** Extra JSON-LD graphs for this page (breadcrumbs, profile, etc.). */
   schemas?: (Record<string, unknown> | Record<string, unknown>[])[];
 }
@@ -34,6 +36,7 @@ const {
   type,
   rawTitle,
   noindex,
+  robots,
   schemas = [],
 } = Astro.props;
 ---
@@ -73,6 +76,7 @@ const {
       type={type}
       rawTitle={rawTitle}
       noindex={noindex}
+      robots={robots}
     />
 
     {/* Site-wide structured data */}

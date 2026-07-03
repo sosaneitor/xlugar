@@ -1,0 +1,82 @@
+---
+/**
+ * "Popular Categories" hub — a single crawlable page that links to every
+ * programmatic /tags/[tag] page and every keyword landing. This is the top of
+ * the internal-linking pyramid (§3C): it spreads crawl equity to the tag pages
+ * and gives users a browse-all entry point.
+ */
+import BaseLayout from '@layouts/BaseLayout.astro';
+import SiteHeader from '@components/SiteHeader.astro';
+import SiteFooter from '@components/SiteFooter.astro';
+import Section from '@components/ui/Section.astro';
+import { TAGS, tagLabel, LANDINGS } from '@features/catalog/data/landings';
+import { breadcrumbSchema, itemListSchema } from '@lib/schema';
+
+const description =
+  'Browse live cam models by category and tag — Latina, MILF, Asian, Ebony and more. Every list is live and refreshed every minute. 18+ only.';
+
+const breadcrumbs = breadcrumbSchema([
+  { name: 'Home', path: '/' },
+  { name: 'Tags', path: '/tags' },
+]);
+const tagList = itemListSchema(
+  TAGS.map((t) => ({ name: tagLabel(t), path: `/tags/${t}` })),
+  'Popular cam tags',
+);
+---
+<BaseLayout
+  title="Popular Cam Categories & Tags — Browse Live Models"
+  description={description}
+  canonical="/tags"
+  schemas={[breadcrumbs, tagList]}
+>
+  <SiteHeader slot="header" />
+
+  <Section labelledby="tags-title">
+    <header class="flex max-w-3xl flex-col gap-4" data-reveal>
+      <nav aria-label="Breadcrumb" class="text-sm text-fg-subtle">
+        <a href="/" class="hover:text-premium-300">Home</a> <span aria-hidden="true">/</span>
+        <span class="text-fg-muted">Tags</span>
+      </nav>
+      <h1 id="tags-title" class="text-4xl text-fg sm:text-5xl">Browse live cams by category</h1>
+      <p class="text-fg-muted">
+        Jump straight to the scene you're after. Every category and tag below is a live, self-updating list
+        of models streaming right now, ranked by who's drawing the biggest audience this minute.
+      </p>
+    </header>
+
+    <h2 class="mt-12 text-sm uppercase tracking-[0.14em] text-fg-subtle">Featured cam categories</h2>
+    <ul class="mt-4 grid grid-cols-2 gap-4 sm:grid-cols-3 lg:grid-cols-4" data-reveal-group data-reveal-step="60">
+      {LANDINGS.map((l) => (
+        <li>
+          <a
+            href={`/${l.slug}`}
+            class="flex h-full flex-col justify-between gap-6 rounded-(--radius-lg) border border-border bg-surface p-5
+                   transition-[transform,border-color] duration-(--dur-mid) ease-(--ease-out-soft)
+                   hover:-translate-y-1 hover:border-premium-500 motion-reduce:transform-none"
+          >
+            <span class="text-lg text-fg">{l.label}</span>
+            <span class="text-sm text-premium-300">View live →</span>
+          </a>
+        </li>
+      ))}
+    </ul>
+
+    <h2 class="mt-14 text-sm uppercase tracking-[0.14em] text-fg-subtle">Popular tags</h2>
+    <ul class="mt-4 flex flex-wrap gap-3">
+      {TAGS.map((t) => (
+        <li>
+          <a
+            href={`/tags/${t}`}
+            class="rounded-(--radius-pill) border border-border-strong bg-surface px-4 py-2 text-sm text-fg-muted
+                   transition-colors duration-(--dur-fast) hover:border-premium-500 hover:text-premium-300"
+          >
+            #{tagLabel(t)}
+          </a>
+        </li>
+      ))}
+    </ul>
+  </Section>
+
+  <SiteFooter slot="footer" />
+</BaseLayout>

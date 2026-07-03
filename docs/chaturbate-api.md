@@ -53,6 +53,14 @@ Notes:
   `chat_room_url`.
 - `iframe_embed_revshare` is available if we ever want an inline live preview.
 
+## Featured Models row (Feature E)
+
+The homepage "Featured models" row shows the most-watched models **in real time**,
+straight from the affiliate API — no scraping, cron, or extra env config. It reuses
+the shared `useRooms` hook (polls `/api/rooms` every 60s) and the API's own
+`image_url_360x270` snapshot, cropped to a portrait card. See
+`src/features/featured/components/FeaturedPhotos.tsx`.
+
 ## Affiliate link tours
 
 Static promo links (home CTAs, category tours) use `/in/?tour=...&campaign=...`,

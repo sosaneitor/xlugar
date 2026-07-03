@@ -1,0 +1,100 @@
+---
+/**
+ * Programmatic per-tag SEO pages: /tags/latina/, /tags/milf/, … generated from
+ * the curated TAGS list. Each is statically indexable (unique h1/title/intro);
+ * the live grid for that tag hydrates client-side. These pages carry the bulk of
+ * the internal-linking graph (linked from every card's tag chips and each
+ * landing's "Popular tags" row).
+ */
+import BaseLayout from '@layouts/BaseLayout.astro';
+import SiteHeader from '@components/SiteHeader.astro';
+import SiteFooter from '@components/SiteFooter.astro';
+import Section from '@components/ui/Section.astro';
+import LiveCatalog from '@features/catalog/components/LiveCatalog.tsx';
+import { TAGS, tagLabel } from '@features/catalog/data/landings';
+import { LANDINGS } from '@features/catalog/data/landings';
+import { breadcrumbSchema, collectionPageSchema } from '@lib/schema';
+
+export function getStaticPaths() {
+  return TAGS.map((t) => ({ params: { tag: t } }));
+}
+
+const { tag } = Astro.params;
+if (!TAGS.includes(tag!)) {
+  return Astro.redirect('/tags', 302);
+}
+const label = tagLabel(tag!);
+const path = `/tags/${tag}`;
+
+const title = `Live ${label} Cams — ${label} Models Online Now`;
+const description = `Watch live ${label.toLowerCase()} cam models streaming right now. Public rooms tagged ${label.toLowerCase()}, ranked by current viewers and refreshed every minute. 18+.`;
+const h1 = `${label} Cams — Live ${label} Models Online Now`;
+const intro = `Every room on this page carries the ${label.toLowerCase()} tag and is broadcasting live on a public webcam right now. We rank the grid by current viewer count so the busiest ${label.toLowerCase()} streams appear first, while new broadcasters slot in as they come online. The thumbnails refresh roughly every minute, so a quick reload always shows who just went live. Use the filters to narrow by spoken language or a minimum audience, then open any room to watch free — no account required to start.`;
+
+const breadcrumbs = breadcrumbSchema([
+  { name: 'Home', path: '/' },
+  { name: 'Tags', path: '/tags' },
+  { name: label, path },
+]);
+const collection = collectionPageSchema({ name: h1, description, path });
+
+// Sibling tags for the related row.
+const related = TAGS.filter((t) => t !== tag);
+---
+<BaseLayout title={title} description={description} canonical={path} schemas={[breadcrumbs, collection]}>
+  <SiteHeader slot="header" />
+
+  <Section labelledby="tag-title">
+    <header class="flex max-w-3xl flex-col gap-4" data-reveal>
+      <nav aria-label="Breadcrumb" class="text-sm text-fg-subtle">
+        <a href="/" class="hover:text-premium-300">Home</a> <span aria-hidden="true">/</span>
+        <a href="/tags" class="hover:text-premium-300">Tags</a> <span aria-hidden="true">/</span>
+        <span class="text-fg-muted">{label}</span>
+      </nav>
+      <h1 id="tag-title" class="text-4xl text-fg sm:text-5xl">{h1}</h1>
+      <p class="text-fg-muted">{intro}</p>
+    </header>
+
+    <div class="mt-10">
+      <LiveCatalog client:visible initialTag={tag} initialRegion="all" pageSize={24} adEvery={12} />
+    </div>
+
+    {/* Related tags */}
+    <nav class="mt-14 border-t border-border pt-8" aria-label="Related tags">
+      <h2 class="text-sm uppercase tracking-[0.14em] text-fg-subtle">Related tags</h2>
+      <ul class="mt-4 flex flex-wrap gap-3">
+        {related.map((t) => (
+          <li>
+            <a
+              href={`/tags/${t}`}
+              class="rounded-(--radius-pill) border border-border-strong bg-surface px-4 py-2 text-sm text-fg-muted
+                     transition-colors duration-(--dur-fast) hover:border-premium-500 hover:text-premium-300"
+            >
+              #{tagLabel(t)}
+            </a>
+          </li>
+        ))}
+      </ul>
+    </nav>
+
+    {/* Back to landings */}
+    <nav class="mt-8" aria-label="Cam categories">
+      <h2 class="text-sm uppercase tracking-[0.14em] text-fg-subtle">Browse live cams</h2>
+      <ul class="mt-4 flex flex-wrap gap-3">
+        {LANDINGS.map((l) => (
+          <li>
+            <a
+              href={`/${l.slug}`}
+              class="rounded-(--radius-pill) border border-border-strong bg-surface px-4 py-2 text-sm text-fg-muted
+                     transition-colors duration-(--dur-fast) hover:border-premium-500 hover:text-premium-300"
+            >
+              {l.label}
+            </a>
+          </li>
+        ))}
+      </ul>
+    </nav>
+  </Section>
+
+  <SiteFooter slot="footer" />
+</BaseLayout>

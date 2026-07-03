@@ -1,0 +1,24 @@
+---
+/**
+ * Keyword-rich SEO landing routes generated from LANDINGS:
+ *   /live-cam-girls/  /colombian-cam-girls/  /latina-cam-girls/
+ *   /live-female-cams/  /live-male-cams/  /live-couple-cams/  /live-trans-cams/
+ *
+ * Root-level static pages (/about, /models, /categories, …) take precedence over
+ * this dynamic route, and getStaticPaths only emits the landing slugs, so there
+ * is no collision. Each page is fully static/indexable; the grid hydrates client-side.
+ */
+import CamLanding from '@features/catalog/components/CamLanding.astro';
+import { LANDINGS, getLandingBySlug } from '@features/catalog/data/landings';
+
+export function getStaticPaths() {
+  return LANDINGS.map((l) => ({ params: { landing: l.slug } }));
+}
+
+const { landing: slug } = Astro.params;
+const landing = getLandingBySlug(slug!);
+if (!landing) {
+  return Astro.redirect('/models', 302);
+}
+---
+<CamLanding landing={landing} />

@@ -1,4 +1,10 @@
 User-agent: *
 Allow: /
 
+# The on-demand data proxy is not indexable content.
+Disallow: /api/
+# Filter/param permutations (?tag=, ?gender=, …) are client-side state, not
+# distinct pages — keep them out of the index to avoid duplicate content.
+Disallow: /*?
+
 Sitemap: https://xlugar.com/sitemap-index.xml
