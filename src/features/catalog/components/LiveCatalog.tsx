@@ -1,9 +1,9 @@
-import { useMemo, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import { useRooms } from '../hooks/useRooms';
 import { DEFAULT_REGION } from '../services/chaturbate';
 import type { Region, SortMode } from '../services/chaturbate';
 import { buildRoomLink } from '@features/affiliate/utils/whiteLabel';
-import { countryToFlag, countryName } from '../utils/country';
+import { countryName } from '../utils/country';
 import type { ChaturbateRoom, Gender } from '../types/room';
 
 interface LiveCatalogProps {
@@ -78,12 +78,22 @@ function primaryLanguage(spoken: string): string {
   return spoken.split(',')[0]?.trim() ?? '';
 }
 
-export function RoomCard({ room, cacheBust }: { room: ChaturbateRoom; cacheBust: number }) {
+export function RoomCard({
+  room,
+  cacheBust,
+  priority = false,
+}: {
+  room: ChaturbateRoom;
+  cacheBust: number;
+  /** Above-the-fold card: eager-load with high fetch priority for LCP. */
+  priority?: boolean;
+}) {
   const src = room.image_url_360x270 || room.image_url;
   const img = src ? `${src}${src.includes('?') ? '&' : '?'}t=${cacheBust}` : '';
   const tags = room.tags.slice(0, 3);
-  const flag = countryToFlag(room.country);
   // Prefer the model's own free-text location; else the resolved country name.
+  // (No emoji flag here — regional-indicator glyphs render as raw letters, e.g.
+  // "CO", on Windows/Chrome. The country name carries the location instead.)
   const place = room.location || countryName(room.country);
   const title = room.display_name || room.username;
   const subject = room.room_subject?.trim();
@@ -110,10 +120,11 @@ export function RoomCard({ room, cacheBust }: { room: ChaturbateRoom; cacheBust:
           {img && (
             <img
               src={img}
-              alt={`${room.username} live cam preview`}
+              alt={`${title} live cam preview`}
               width={360}
               height={270}
-              loading="lazy"
+              loading={priority ? 'eager' : 'lazy'}
+              fetchPriority={priority ? 'high' : 'auto'}
               decoding="async"
               referrerPolicy="no-referrer"
               onError={(e) => {
@@ -125,10 +136,13 @@ export function RoomCard({ room, cacheBust }: { room: ChaturbateRoom; cacheBust:
                          group-hover:scale-[1.05] motion-reduce:transform-none"
             />
           )}
-          <div className="pointer-events-none absolute inset-x-0 bottom-0 h-2/3 bg-gradient-to-t from-bg to-transparent" />
-          <div className="absolute left-3 top-3 flex flex-wrap gap-2">
-            <span className="inline-flex items-center gap-1.5 rounded-(--radius-pill) border border-success bg-surface px-2.5 py-1 text-[0.625rem] font-semibold uppercase tracking-[0.08em] text-success">
-              <span className="h-1.5 w-1.5 rounded-full bg-success" aria-hidden="true" />
+          {/* Solid-dark scrim (no glass): tall + strong enough that up to four
+              text lines stay legible over bright thumbnails on small cards. */}
+          <div className="pointer-events-none absolute inset-x-0 bottom-0 h-4/5 bg-gradient-to-t from-bg via-bg/85 to-transparent" />
+          <div className="absolute left-2.5 top-2.5 flex flex-wrap gap-1.5">
+            {/* LIVE — on-brand hot-pink pill (was off-system green). */}
+            <span className="inline-flex items-center gap-1.5 rounded-(--radius-pill) bg-primary-500 px-2.5 py-1 text-[0.625rem] font-semibold uppercase tracking-[0.08em] text-on-primary">
+              <span className="h-1.5 w-1.5 rounded-full bg-on-primary motion-safe:animate-pulse" aria-hidden="true" />
               {room.num_users.toLocaleString()} live
             </span>
             {room.is_hd && (
@@ -143,28 +157,28 @@ export function RoomCard({ room, cacheBust }: { room: ChaturbateRoom; cacheBust:
             )}
           </div>
         </div>
-        <div className="absolute inset-x-0 bottom-0 p-4">
-          <h3 className="text-lg text-fg">
-            {flag && <span className="mr-1" aria-hidden="true">{flag}</span>}
+        {/* Text pinned to the bottom; badges pinned to the top — they never collide. */}
+        <div className="absolute inset-x-0 bottom-0 p-3 sm:p-4">
+          <h3 className="truncate text-base font-semibold text-fg sm:text-lg">
             {title}
             {room.age ? (
-              <span className="font-sans text-base font-normal text-fg-muted">, {room.age}</span>
+              <span className="font-sans text-sm font-normal text-fg-muted">, {room.age}</span>
             ) : null}
           </h3>
           {subject && (
-            <p className="mt-0.5 truncate text-sm text-fg" title={subject}>
+            <p className="mt-0.5 truncate text-xs text-fg-muted sm:text-sm" title={subject}>
               {subject}
             </p>
           )}
           {(place || tags.length > 0) && (
-            <p className="mt-0.5 truncate text-sm text-fg-muted">
+            <p className="mt-0.5 truncate text-xs text-fg-muted">
               {place && <span>{place}</span>}
               {place && tags.length > 0 && <span> · </span>}
               {tags.map((t) => `#${t}`).join(' ')}
             </p>
           )}
           {meta.length > 0 && (
-            <p className="mt-1 truncate text-xs text-fg-subtle">{meta.join(' · ')}</p>
+            <p className="mt-1 truncate text-[0.6875rem] text-fg-subtle">{meta.join(' · ')}</p>
           )}
         </div>
       </a>
@@ -239,8 +253,143 @@ export default function LiveCatalog({
     };
   }
 
+  // --- Mobile filter drawer ---
+  const [drawerOpen, setDrawerOpen] = useState(false);
+
+  // Defaults to compare against so seeded (category/landing) filters don't read
+  // as "active" until the user actually changes them.
+  const defaultRegion = initialRegion ?? DEFAULT_REGION ?? 'all';
+  const defaultGender: Gender | '' = initialGender ?? '';
+  const defaultLanguage = initialLanguage ?? '';
+
+  const regionLabel = REGION_TABS.find((r) => r.value === region)?.label ?? region;
+  const genderLabel = GENDERS.find((g) => g.value === gender)?.label ?? '';
+
+  // Active-filter chips shown above the collapsed drawer on mobile.
+  const chips: { key: string; label: string; clear: () => void }[] = [];
+  if (region !== defaultRegion)
+    chips.push({ key: 'region', label: regionLabel, clear: () => change(setRegion)(defaultRegion) });
+  if (gender !== defaultGender)
+    chips.push({ key: 'gender', label: genderLabel, clear: () => change(setGender)(defaultGender) });
+  if (sort !== 'viewers')
+    chips.push({ key: 'sort', label: 'Newest live', clear: () => change(setSort)('viewers') });
+  if (language !== defaultLanguage && language)
+    chips.push({ key: 'language', label: language, clear: () => change(setLanguage)(defaultLanguage) });
+  if (minViewers > 0)
+    chips.push({ key: 'viewers', label: `${minViewers}+ viewers`, clear: () => change(setMinViewers)(0) });
+  if (hdOnly) chips.push({ key: 'hd', label: 'HD only', clear: () => change(setHdOnly)(false) });
+  if (newOnly) chips.push({ key: 'new', label: 'New only', clear: () => change(setNewOnly)(false) });
+
+  function clearAll() {
+    change(setRegion)(defaultRegion);
+    setGender(defaultGender);
+    setSort('viewers');
+    setLanguage(defaultLanguage);
+    setMinViewers(0);
+    setHdOnly(false);
+    setNewOnly(false);
+    setPage(1);
+  }
+
+  // Lock body scroll + close on Escape while the mobile drawer is open.
+  useEffect(() => {
+    if (!drawerOpen) return;
+    const prev = document.body.style.overflow;
+    document.body.style.overflow = 'hidden';
+    const onKey = (e: KeyboardEvent) => {
+      if (e.key === 'Escape') setDrawerOpen(false);
+    };
+    document.addEventListener('keydown', onKey);
+    return () => {
+      document.body.style.overflow = prev;
+      document.removeEventListener('keydown', onKey);
+    };
+  }, [drawerOpen]);
+
   return (
     <div>
+      {/* Mobile: collapsed summary bar — result count + Filters (drawer trigger)
+          + refresh — so the first card is visible without scrolling past controls. */}
+      <div className="flex items-center gap-3 lg:hidden">
+        <button
+          type="button"
+          onClick={() => setDrawerOpen(true)}
+          aria-haspopup="dialog"
+          aria-expanded={drawerOpen}
+          className="inline-flex items-center gap-2 rounded-(--radius-pill) border border-border-strong bg-surface px-4 py-2 text-sm text-fg
+                     transition-colors duration-(--dur-fast) hover:border-premium-500 hover:text-premium-300"
+        >
+          Filters{chips.length > 0 ? ` (${chips.length})` : ''}
+        </button>
+        {status === 'ready' && (
+          <span className="text-sm text-fg-muted">{filtered.length.toLocaleString()} live</span>
+        )}
+        <button
+          type="button"
+          onClick={refresh}
+          className="ml-auto rounded-(--radius-md) border border-border-strong bg-surface px-3 py-2 text-sm text-fg
+                     transition-colors duration-(--dur-fast) hover:border-premium-500 hover:text-premium-300"
+        >
+          Refresh
+        </button>
+      </div>
+
+      {/* Mobile: active-filter chips summary (each removable). */}
+      {chips.length > 0 && (
+        <div className="mt-3 flex flex-wrap gap-2 lg:hidden">
+          {chips.map((c) => (
+            <button
+              key={c.key}
+              type="button"
+              onClick={c.clear}
+              className="inline-flex items-center gap-1 rounded-(--radius-pill) border border-premium-500 bg-premium-500/10 px-3 py-1 text-xs text-premium-200"
+            >
+              {c.label}
+              <span aria-hidden="true">✕</span>
+              <span className="sr-only">Remove filter</span>
+            </button>
+          ))}
+          <button
+            type="button"
+            onClick={clearAll}
+            className="rounded-(--radius-pill) px-3 py-1 text-xs text-fg-subtle underline hover:text-premium-300"
+          >
+            Clear all
+          </button>
+        </div>
+      )}
+
+      {/* Mobile drawer backdrop — solid dark scrim (no blur / glass). */}
+      {drawerOpen && (
+        <div
+          onClick={() => setDrawerOpen(false)}
+          className="fixed inset-0 z-30 bg-bg/80 lg:hidden"
+          aria-hidden="true"
+        />
+      )}
+
+      {/* Controls: a bottom-sheet drawer on mobile, static inline on desktop.
+          transform/opacity only; solid --c-surface background. */}
+      <div
+        role="group"
+        aria-label="Filters and sorting"
+        className={`fixed inset-x-0 bottom-0 z-40 max-h-[85vh] overflow-y-auto rounded-t-(--radius-xl) border-t border-border-strong
+                    bg-surface p-5 pb-8 shadow-[var(--shadow-card)] transition-transform duration-(--dur-mid) ease-(--ease-out-soft)
+                    lg:static lg:z-auto lg:max-h-none lg:overflow-visible lg:rounded-none lg:border-0 lg:bg-transparent lg:p-0 lg:shadow-none lg:transition-none
+                    ${drawerOpen ? 'translate-y-0' : 'translate-y-full lg:translate-y-0'}`}
+      >
+        {/* Drawer header (mobile only). */}
+        <div className="mb-4 flex items-center justify-between lg:hidden">
+          <h2 className="text-lg text-fg">Filters</h2>
+          <button
+            type="button"
+            onClick={() => setDrawerOpen(false)}
+            className="rounded-(--radius-pill) bg-primary-500 px-4 py-1.5 text-sm font-semibold text-on-primary"
+          >
+            Done
+          </button>
+        </div>
+
       {/* Server-side tabs: region + gender (re-fetch the pool from CB). */}
       <div className="flex flex-col gap-3">
         <div className="flex flex-wrap gap-2" role="group" aria-label="Region">
@@ -343,6 +492,7 @@ export default function LiveCatalog({
           Refresh
         </button>
       </div>
+      </div>
 
       {/* States */}
       {status === 'loading' && (
@@ -384,7 +534,14 @@ export default function LiveCatalog({
         <>
           <ul className="mt-8 grid grid-cols-1 gap-4 sm:grid-cols-2 sm:gap-5 md:grid-cols-3 lg:grid-cols-4">
             {pageItems.map((room, i) => {
-              const cards = [<RoomCard key={room.username} room={room} cacheBust={lastUpdated} />];
+              const cards = [
+                <RoomCard
+                  key={room.username}
+                  room={room}
+                  cacheBust={lastUpdated}
+                  priority={safePage === 1 && i < 4}
+                />,
+              ];
               // In-grid ad placeholder every `adEvery` cards.
               if (adEvery > 0 && (i + 1) % adEvery === 0 && i + 1 < pageItems.length) {
                 cards.push(<AdCard key={`ad-${i}`} />);

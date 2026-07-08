@@ -1,0 +1,119 @@
+---
+/**
+ * Renders a complete keyword-rich SEO landing page from a Landing config:
+ * breadcrumb + h1 + intro (the indexable content), the live room grid, JSON-LD
+ * (BreadcrumbList + CollectionPage + ItemList), and internal-linking navs to
+ * sibling landings and popular tags. Each landing route file is a thin wrapper
+ * that looks up its config and renders this component.
+ */
+import BaseLayout from '@layouts/BaseLayout.astro';
+import SiteHeader from '@components/SiteHeader.astro';
+import SiteFooter from '@components/SiteFooter.astro';
+import Section from '@components/ui/Section.astro';
+import LiveCatalog from '@features/catalog/components/LiveCatalog.tsx';
+import AdSlot from '@features/ads/components/AdSlot.astro';
+import { LANDINGS, TAGS, tagLabel, type Landing } from '@features/catalog/data/landings';
+import { breadcrumbSchema, collectionPageSchema, itemListSchema } from '@lib/schema';
+
+interface Props {
+  landing: Landing;
+}
+const { landing } = Astro.props;
+const path = `/${landing.slug}`;
+
+const breadcrumbs = breadcrumbSchema([
+  { name: 'Home', path: '/' },
+  { name: landing.label, path },
+]);
+const collection = collectionPageSchema({
+  name: landing.h1,
+  description: landing.description,
+  path,
+});
+// ItemList of sibling landings — signals the curated collection to crawlers.
+const siblingList = itemListSchema(
+  LANDINGS.map((l) => ({ name: l.label, path: `/${l.slug}` })),
+  'Live cam categories',
+);
+
+const related = LANDINGS.filter((l) => l.slug !== landing.slug);
+// A small, relevant slice of tags for the related-tags row.
+const relatedTags = TAGS.slice(0, 12);
+---
+<BaseLayout
+  title={landing.title}
+  description={landing.description}
+  canonical={path}
+  schemas={[breadcrumbs, collection, siblingList]}
+>
+  <SiteHeader slot="header" />
+
+  <Section labelledby="landing-title">
+    <header class="flex max-w-3xl flex-col gap-4" data-reveal>
+      <nav aria-label="Breadcrumb" class="text-sm text-fg-subtle">
+        <a href="/" class="hover:text-premium-300">Home</a> <span aria-hidden="true">/</span>
+        <span class="text-fg-muted">{landing.label}</span>
+      </nav>
+      <h1 id="landing-title" class="text-4xl text-fg sm:text-5xl">{landing.h1}</h1>
+      <p class="text-fg-muted">{landing.intro}</p>
+    </header>
+
+    <div class="mt-10 grid gap-8 lg:grid-cols-[1fr_300px]">
+      <div>
+        <LiveCatalog
+          client:visible
+          initialTag={landing.tag}
+          initialCountry={landing.country}
+          initialLanguage={landing.language}
+          initialGender={landing.gender}
+          initialRegion={landing.region}
+          pageSize={24}
+          adEvery={12}
+        />
+      </div>
+      <aside class="hidden lg:block">
+        <div class="sticky top-24">
+          <AdSlot variant="sidebar" slotId={`landing-${landing.slug}-sidebar`} />
+        </div>
+      </aside>
+    </div>
+
+    {/* Internal linking: sibling landings */}
+    <nav class="mt-14 border-t border-border pt-8" aria-label="More cam categories">
+      <h2 class="text-sm uppercase tracking-[0.14em] text-fg-subtle">More live cams</h2>
+      <ul class="mt-4 flex flex-wrap gap-3">
+        {related.map((l) => (
+          <li>
+            <a
+              href={`/${l.slug}`}
+              class="rounded-(--radius-pill) border border-border-strong bg-surface px-4 py-2 text-sm text-fg-muted
+                     transition-colors duration-(--dur-fast) hover:border-premium-500 hover:text-premium-300"
+            >
+              {l.label}
+            </a>
+          </li>
+        ))}
+      </ul>
+    </nav>
+
+    {/* Internal linking: popular tags */}
+    <nav class="mt-8" aria-label="Popular tags">
+      <h2 class="text-sm uppercase tracking-[0.14em] text-fg-subtle">Popular tags</h2>
+      <ul class="mt-4 flex flex-wrap gap-3">
+        {relatedTags.map((t) => (
+          <li>
+            <a
+              href={`/tags/${t}`}
+              class="rounded-(--radius-pill) border border-border-strong bg-surface px-4 py-2 text-sm text-fg-muted
+                     transition-colors duration-(--dur-fast) hover:border-premium-500 hover:text-premium-300"
+            >
+              #{tagLabel(t)}
+            </a>
+          </li>
+        ))}
+      </ul>
+    </nav>
+  </Section>
+
+  <SiteFooter slot="footer" />
+</BaseLayout>

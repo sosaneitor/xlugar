@@ -42,12 +42,13 @@ export default function FeaturedRooms({
     limit: 120,
   });
 
+  // 1-col across all phone widths (legible cards); multi-column only from the
+  // sm/tablet breakpoint up.
+  const gridClass = 'grid grid-cols-1 gap-4 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4';
+
   if (status === 'loading') {
     return (
-      <ul
-        className="grid grid-cols-2 gap-4 sm:grid-cols-3 lg:grid-cols-4"
-        aria-hidden="true"
-      >
+      <ul className={gridClass} aria-hidden="true">
         {Array.from({ length: count }).map((_, i) => (
           <li
             key={i}
@@ -62,9 +63,9 @@ export default function FeaturedRooms({
   if (items.length === 0) return null;
 
   return (
-    <ul className="grid grid-cols-2 gap-4 sm:grid-cols-3 lg:grid-cols-4">
-      {items.map((room) => (
-        <RoomCard key={room.username} room={room} cacheBust={lastUpdated} />
+    <ul className={gridClass}>
+      {items.map((room, i) => (
+        <RoomCard key={room.username} room={room} cacheBust={lastUpdated} priority={i < 4} />
       ))}
     </ul>
   );

@@ -8,6 +8,9 @@ import SectionHeading from '@components/ui/SectionHeading.astro';
 import Button from '@components/ui/Button.astro';
 import LiveCatalog from '@features/catalog/components/LiveCatalog.tsx';
 import FeaturedRooms from '@features/catalog/components/FeaturedRooms.tsx';
+import FeaturedPhotos from '@features/featured/components/FeaturedPhotos.tsx';
+import ColombiaCounter from '@features/catalog/components/ColombiaCounter.tsx';
+import TagChips from '@components/TagChips.astro';
 import { FEATURED_CATEGORIES } from '@features/catalog/data/categories';
 import { buildRetentionLink } from '@features/affiliate/utils/whiteLabel';
 import { itemListSchema } from '@lib/schema';
@@ -29,18 +32,31 @@ const categoryList = itemListSchema(
 
   <Hero />
 
-  {/* Colombianas / LatAm live — the priority audience, ranked first */}
-  <Section id="colombianas" labelledby="colombianas-title">
-    <SectionHeading eyebrow="En vivo ahora" eyebrowVariant="premium" title="Colombianas en vivo" id="colombianas-title">
+  {/* Colombian / LatAm live — the priority audience, ranked first */}
+  <Section id="colombian" labelledby="colombian-title">
+    <SectionHeading eyebrow="Live now" eyebrowVariant="premium" title="Colombian Cam Girls — Live Now" id="colombian-title">
       <p class="text-fg-muted">
-        Modelos de Colombia y Latinoamérica transmitiendo en este momento, ordenadas por audiencia en vivo.
+        Colombian and Latina models streaming live right now, ranked by who's drawing the biggest audience this minute.
       </p>
+      <div class="mt-3">
+        <ColombiaCounter client:visible />
+      </div>
     </SectionHeading>
     <div class="mt-10">
       <FeaturedRooms client:visible region="southamerica" country="CO" gender="f" count={8} />
     </div>
     <div class="mt-10 flex justify-center">
-      <Button href="/models/colombian" variant="gradient" size="lg">Ver todas las colombianas</Button>
+      <Button href="/colombian-cam-girls/" variant="gradient" size="lg">See all Colombian models</Button>
+    </div>
+  </Section>
+
+  {/* Featured models — bio photos scraped on the VPS (Feature E), thumbnail fallback */}
+  <Section id="featured" labelledby="featured-title" class="bg-bg-elev">
+    <SectionHeading eyebrow="Featured" eyebrowVariant="premium" title="Featured models" id="featured-title">
+      <p class="text-fg-muted">A hand-picked lineup of the most-watched models on cam right now.</p>
+    </SectionHeading>
+    <div class="mt-10">
+      <FeaturedPhotos client:visible count={12} />
     </div>
   </Section>
 
@@ -51,7 +67,10 @@ const categoryList = itemListSchema(
         Real rooms, streaming this minute and ranked by who's drawing the biggest crowd. Updated every 60 seconds.
       </p>
     </SectionHeading>
-    <div class="mt-10">
+    <div class="mt-8">
+      <TagChips limit={16} />
+    </div>
+    <div class="mt-8">
       <LiveCatalog client:visible pageSize={12} adEvery={0} />
     </div>
     <div class="mt-10 flex justify-center">

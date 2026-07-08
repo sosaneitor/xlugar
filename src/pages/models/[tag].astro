@@ -6,6 +6,7 @@ import Section from '@components/ui/Section.astro';
 import LiveCatalog from '@features/catalog/components/LiveCatalog.tsx';
 import AdSlot from '@features/ads/components/AdSlot.astro';
 import { CATEGORIES, getCategoryBySlug } from '@features/catalog/data/categories';
+import { canonicalLandingForCategory } from '@features/catalog/data/landings';
 import { breadcrumbSchema, collectionPageSchema } from '@lib/schema';
 
 export function getStaticPaths() {
@@ -17,6 +18,11 @@ const category = getCategoryBySlug(tag!);
 if (!category) {
   return Astro.redirect('/models', 302);
 }
+
+// When a keyword landing (e.g. /latina-cam-girls/) targets the same rooms, it is
+// the primary — point this page's canonical there to avoid duplicate content.
+const primaryLanding = canonicalLandingForCategory(category.slug);
+const canonicalPath = primaryLanding ? `/${primaryLanding.slug}` : `/models/${category.slug}`;
 
 const breadcrumbs = breadcrumbSchema([
   { name: 'Home', path: '/' },
@@ -34,7 +40,7 @@ const related = CATEGORIES.filter((c) => c.slug !== category.slug);
 <BaseLayout
   title={category.title}
   description={category.description}
-  canonical={`/models/${category.slug}`}
+  canonical={canonicalPath}
   image={`/og/models/${category.slug}.png`}
   schemas={[breadcrumbs, collection]}
 >

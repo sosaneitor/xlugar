@@ -1,0 +1,32 @@
+---
+/**
+ * Horizontal, scrollable row of tag links (Feature A + internal linking §3C).
+ * Pure anchors → crawlable and shareable, and cheap (no island/JS). Each chip
+ * links to the programmatic /tags/[tag] page. Rendered above model grids on the
+ * home page and the full catalog.
+ */
+import { TAGS, tagLabel } from '@features/catalog/data/landings';
+
+interface Props {
+  /** How many tags to show. */
+  limit?: number;
+  class?: string;
+}
+const { limit = TAGS.length, class: className = '' } = Astro.props;
+const tags = TAGS.slice(0, limit);
+---
+<nav aria-label="Browse by tag" class:list={['w-full', className]}>
+  <ul class="flex gap-2 overflow-x-auto pb-1 [scrollbar-width:thin]">
+    {tags.map((t) => (
+      <li class="shrink-0">
+        <a
+          href={`/tags/${t}`}
+          class="inline-block rounded-(--radius-pill) border border-border-strong bg-surface px-4 py-2 text-sm text-fg-muted
+                 transition-colors duration-(--dur-fast) hover:border-premium-500 hover:text-premium-300"
+        >
+          #{tagLabel(t)}
+        </a>
+      </li>
+    ))}
+  </ul>
+</nav>
