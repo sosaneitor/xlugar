@@ -1,16 +1,20 @@
 ---
 /**
- * CookieConsent — GDPR/ePrivacy consent banner that gates analytics.
+ * CookieConsent — cookie notice using Google Consent Mode v2 with per-region
+ * defaults (opt-out outside the EU, opt-in inside).
  *
- * Why: Google Analytics + Google Tag Manager are non-essential (analytics)
- * cookies. Under GDPR/ePrivacy they must NOT load until the visitor consents.
- * This component is the ONLY place that injects GA/GTM — the loaders fire
- * exclusively after consent is granted (or was granted on a previous visit).
+ * Why: GA/GTM load from the start, but consent is granted or denied PER REGION:
+ *   · Rest of world (US, LATAM, …): analytics GRANTED by default (opt-out, legal
+ *     in the US) → measures with cookies until the visitor rejects.
+ *   · EU/EEA + UK + Switzerland: analytics DENIED by default (opt-in) → only
+ *     cookieless anonymous pings until the visitor accepts. Google picks the right
+ *     default from the visitor's real location (IP).
+ * Advertising (ad_*) stays denied always — we only use Analytics.
  *
- * Choices are stored in localStorage under `xlugar_cookie_consent`:
- *   'granted' → analytics injected · 'denied' → nothing loads.
- * When no choice is stored the banner is shown. The strictly-necessary age-gate
- * cookie is unaffected and needs no consent.
+ * The visitor's choice overrides their region default and is stored in
+ * localStorage under `xlugar_cookie_consent`: 'granted' | 'denied'. When no choice
+ * is stored the banner is shown. The strictly-necessary age-gate cookie is
+ * unaffected and needs no consent.
  *
  * IDs are passed from BaseLayout; when neither is set the banner never renders.
  */
@@ -83,10 +87,40 @@ const enabled = Boolean(gaId || gtmId);
     (function () {
       var KEY = 'xlugar_cookie_consent';
 
-      function loadAnalytics() {
+      // Regions requiring prior consent (opt-in). ISO 3166: EU/EEA + UK + Switzerland.
+      var OPT_IN_REGIONS = [
+        'AT', 'BE', 'BG', 'HR', 'CY', 'CZ', 'DK', 'EE', 'FI', 'FR', 'DE', 'GR',
+        'HU', 'IE', 'IT', 'LV', 'LT', 'LU', 'MT', 'NL', 'PL', 'PT', 'RO', 'SK',
+        'SI', 'ES', 'SE', 'IS', 'LI', 'NO', 'GB', 'CH',
+      ];
+
+      function gtag() { window.dataLayer.push(arguments); }
+
+      function loadAnalytics(storedChoice) {
         if (window.__xlugarAnalytics) return;
         window.__xlugarAnalytics = true;
         window.dataLayer = window.dataLayer || [];
+        window.gtag = gtag;
+
+        // Consent Mode v2 defaults. Global (opt-out): analytics granted; ads always
+        // denied. EU/UK/CH override (opt-in): analytics denied until accepted.
+        gtag('consent', 'default', {
+          ad_storage: 'denied',
+          ad_user_data: 'denied',
+          ad_personalization: 'denied',
+          analytics_storage: 'granted',
+        });
+        gtag('consent', 'default', {
+          ad_storage: 'denied',
+          ad_user_data: 'denied',
+          ad_personalization: 'denied',
+          analytics_storage: 'denied',
+          region: OPT_IN_REGIONS,
+        });
+        // A stored choice overrides the region default in any region.
+        if (storedChoice === 'granted' || storedChoice === 'denied') {
+          gtag('consent', 'update', { analytics_storage: storedChoice });
+        }
 
         if (gtmId) {
           (function (w, d, s, l, i) {
@@ -106,8 +140,6 @@ const enabled = Boolean(gaId || gtmId);
           g.async = true;
           g.src = 'https://www.googletagmanager.com/gtag/js?id=' + gaId;
           document.head.appendChild(g);
-          function gtag() { dataLayer.push(arguments); }
-          window.gtag = gtag;
           gtag('js', new Date());
           gtag('config', gaId);
         }
@@ -117,15 +149,18 @@ const enabled = Boolean(gaId || gtmId);
         try { localStorage.setItem(KEY, value); } catch (e) {}
         var banner = document.getElementById('cookie-consent');
         if (banner) banner.hidden = true;
-        if (value === 'granted') loadAnalytics();
+        // Override the region default (e.g. a US visitor who rejects goes granted → denied).
+        if (window.gtag) window.gtag('consent', 'update', { analytics_storage: value });
       }
 
       function init() {
         var choice = null;
         try { choice = localStorage.getItem(KEY); } catch (e) {}
 
-        if (choice === 'granted') { loadAnalytics(); return; }
-        if (choice === 'denied') { return; }
+        // Analytics always loads; consent starts per region (or per stored choice).
+        loadAnalytics(choice);
+
+        if (choice === 'granted' || choice === 'denied') return;
 
         // No choice yet → show the banner and wire the buttons.
         var banner = document.getElementById('cookie-consent');

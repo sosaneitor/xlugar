@@ -10,7 +10,8 @@ import CookieConsent from '@components/CookieConsent.astro';
 import '@styles/global.css';
 
 // Analytics / tag manager IDs — both optional; markup is a no-op when unset.
-// These are handed to CookieConsent, which loads them ONLY after consent.
+// Handed to CookieConsent, which loads them with Consent Mode v2 per-region
+// defaults (opt-out outside the EU, opt-in for EU/UK/CH).
 const GA_ID = import.meta.env.PUBLIC_GA_MEASUREMENT_ID?.trim();
 const GTM_ID = import.meta.env.PUBLIC_GTM_ID?.trim();
 
@@ -79,7 +80,8 @@ const {
     <JsonLd schema={websiteSchema()} />
     {schemas.map((s) => <JsonLd schema={s} />)}
 
-    {/* Analytics (GA4 / GTM) is loaded by <CookieConsent> only after consent. */}
+    {/* Analytics (GA4 / GTM) is loaded by <CookieConsent> with Consent Mode v2
+        per-region defaults (opt-out outside the EU, opt-in for EU/UK/CH). */}
 
     {/* Smooth client-side navigation + shared-element transitions */}
     <ClientRouter />
