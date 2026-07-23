@@ -93,6 +93,7 @@ function normalizeRoom(raw: unknown): ChaturbateRoom | null {
     ? (r.gender as Gender)
     : 'f';
   return {
+    source: 'chaturbate',
     username: r.username,
     display_name:
       typeof r.display_name === 'string' && r.display_name ? r.display_name : undefined,

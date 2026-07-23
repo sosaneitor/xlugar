@@ -3,6 +3,7 @@ import { useRooms } from '../hooks/useRooms';
 import { DEFAULT_REGION } from '../services/chaturbate';
 import type { Region, SortMode } from '../services/chaturbate';
 import { buildRoomLink } from '@features/affiliate/utils/whiteLabel';
+import { buildStripchatRoomLink } from '@features/affiliate/utils/stripchatWhiteLabel';
 import { countryName } from '../utils/country';
 import type { ChaturbateRoom, Gender } from '../types/room';
 
@@ -103,8 +104,12 @@ export function RoomCard({
   const followers =
     room.num_followers >= FOLLOWERS_BADGE_FLOOR ? formatCompact(room.num_followers) : '';
   const meta = [uptime, language, followers && `${followers} followers`].filter(Boolean);
-  // Route through the White Label room when configured; else the API revshare link.
-  const href = buildRoomLink(room.username, room.chat_room_url_revshare, 'catalog');
+  // Route by source: Stripchat cards go to their own white label (fallback to the
+  // API clickUrl); Chaturbate cards use the CB white label / revshare link.
+  const href =
+    room.source === 'stripchat'
+      ? buildStripchatRoomLink(room.username, room.chat_room_url_revshare)
+      : buildRoomLink(room.username, room.chat_room_url_revshare, 'catalog');
   return (
     <li>
       <a
@@ -156,6 +161,17 @@ export function RoomCard({
               </span>
             )}
           </div>
+          {/* Source badge (transparency + measurement): SC = Stripchat, CB = Chaturbate. */}
+          <span
+            className={`absolute right-2.5 top-2.5 rounded-(--radius-pill) px-2 py-0.5 text-[0.5625rem] font-semibold uppercase tracking-[0.08em] ${
+              room.source === 'stripchat'
+                ? 'bg-[#e6007e] text-white'
+                : 'bg-black/55 text-white'
+            }`}
+            title={room.source === 'stripchat' ? 'Stripchat' : 'Chaturbate'}
+          >
+            {room.source === 'stripchat' ? 'SC' : 'CB'}
+          </span>
         </div>
         {/* Text pinned to the bottom; badges pinned to the top — they never collide. */}
         <div className="absolute inset-x-0 bottom-0 p-3 sm:p-4">

@@ -9,8 +9,20 @@
 export type Gender = 'f' | 'm' | 'c' | 't';
 export type CurrentShow = 'public' | 'private' | 'group' | 'hidden' | 'away';
 
-/** A single online room as returned by the affiliates API. */
-export interface ChaturbateRoom {
+/**
+ * Which platform a room came from. Discriminates outbound link routing
+ * (white-label per source) and the small platform badge in the UI.
+ */
+export type RoomSource = 'chaturbate' | 'stripchat';
+
+/**
+ * A single online room, normalized to a common shape.
+ * Chaturbate is the native shape; Stripchat rooms are normalized to match
+ * (see services/stripchat.ts) so the catalog/ranking/UI stay source-agnostic.
+ */
+export interface Room {
+  /** Platform of origin. Drives link routing + badge. */
+  source: RoomSource;
   username: string;
   /** Cased display name; falls back to `username` when absent. */
   display_name?: string;
@@ -43,6 +55,13 @@ export interface ChaturbateRoom {
   /** URL slug for the room (usually equals `username`). */
   slug?: string;
 }
+
+/**
+ * Backwards-compatible alias. The catalog historically typed everything as
+ * `ChaturbateRoom`; both sources now share the `Room` shape. Kept so existing
+ * imports keep working while call sites migrate to `Room`.
+ */
+export type ChaturbateRoom = Room;
 
 /** Top-level response. The API returns `{ results: [...] }`; tolerate a bare array. */
 export interface OnlineRoomsResponse {
