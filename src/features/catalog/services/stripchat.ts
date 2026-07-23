@@ -63,6 +63,21 @@ function cleanTag(tag: string): string {
 }
 
 /**
+ * Build an affiliate outbound link for a model when the API doesn't ship a
+ * ready-made `clickUrl`. The `api/models` (Links & Creatives) endpoint often
+ * omits it, which left `chat_room_url_revshare` empty. We deep-link through the
+ * SAME affiliate tracking host as the default link (`STRIPCHAT_API_BASE`, e.g.
+ * `go.whitetrafsa.com`) with our `userId`, so the link carries attribution and
+ * pays commission. Returns '' if the host/userId aren't configured.
+ */
+function buildStripchatClickUrl(username: string): string {
+  if (!STRIPCHAT_API_BASE || !STRIPCHAT_USER_ID || !username) return '';
+  const url = new URL(`${STRIPCHAT_API_BASE}/${encodeURIComponent(username)}`);
+  url.searchParams.set('userId', STRIPCHAT_USER_ID);
+  return url.href;
+}
+
+/**
  * Normalize a raw Stripchat model into the shared `Room` shape, or null when
  * unusable (no username, or not a public/showable stream).
  */
@@ -120,7 +135,10 @@ export function normalizeStripchatModel(raw: unknown): Room | null {
     // Stripchat doesn't expose uptime; "new" ordering comes from the isNew param.
     seconds_online: 0,
     // Outbound-link fallback (used when the white label isn't configured).
-    chat_room_url_revshare: typeof m.clickUrl === 'string' ? m.clickUrl : '',
+    // `api/models` frequently omits `clickUrl`, so build a tracked affiliate
+    // link from the host + userId when it's missing — never leave this empty.
+    chat_room_url_revshare:
+      (typeof m.clickUrl === 'string' && m.clickUrl) || buildStripchatClickUrl(m.username),
     slug: m.username,
   };
 }

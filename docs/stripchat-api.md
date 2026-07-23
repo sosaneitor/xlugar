@@ -72,7 +72,7 @@ Implementado en [`src/features/catalog/services/stripchat.ts`](../src/features/c
 | `spoken_languages`        | `languages.join(', ')`                              |
 | `seconds_online`          | `0` (no expuesto; orden "new" vía `isNew`)          |
 | `current_show`            | `public` / `group` / `private` según `status`       |
-| `chat_room_url_revshare`  | `clickUrl` (fallback de enlace)                     |
+| `chat_room_url_revshare`  | `clickUrl`; si la API no lo trae, se construye `{API_BASE}/{username}?userId=...` |
 
 Solo se muestran modelos con `status === 'public'`.
 

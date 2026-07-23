@@ -1,5 +1,6 @@
 import { useRooms } from '@features/catalog/hooks/useRooms';
 import { buildRoomLink } from '@features/affiliate/utils/whiteLabel';
+import { buildStripchatRoomLink } from '@features/affiliate/utils/stripchatWhiteLabel';
 import { countryName } from '@features/catalog/utils/country';
 
 /** Compact number: 12300 -> "12.3k". */
@@ -43,7 +44,12 @@ export default function FeaturedPhotos({ count = 12 }: { count?: number }) {
   return (
     <ul className="flex snap-x snap-mandatory gap-4 overflow-x-auto pb-2 [scrollbar-width:thin]">
       {items.map((room, i) => {
-        const href = buildRoomLink(room.username, room.chat_room_url_revshare, 'home');
+        // Route by source: Stripchat cards go to their own white label (fallback
+        // to the API revshare link); Chaturbate cards use the CB white label.
+        const href =
+          room.source === 'stripchat'
+            ? buildStripchatRoomLink(room.username, room.chat_room_url_revshare)
+            : buildRoomLink(room.username, room.chat_room_url_revshare, 'home');
         const title = room.display_name || room.username;
         const place = room.location || countryName(room.country);
         const src = room.image_url_360x270 || room.image_url;
